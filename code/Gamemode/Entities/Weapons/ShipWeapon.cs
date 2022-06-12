@@ -1,0 +1,69 @@
+﻿using Sandbox;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ShipSurvivors
+{
+	public partial class ShipWeapon : Upgrade
+	{
+
+		public override void Spawn()
+		{
+			base.Spawn();
+		}
+		public float NextFireTime { get; set; }
+
+		public override void Fire()
+		{
+			if ( IsServer )
+			{
+				if ( NextFireTime <= Time.Now )
+				{
+					NextFireTime = Time.Now + GetAttackSpeed();
+					OnFire();
+				}
+			}
+		}
+		public float GetAttackSpeed()
+		{
+			if (Parent is ShipPlayer parent )
+			{
+				var attackSpeed = 1f - parent.AttackSpeed;
+				if ( attackSpeed < 0.1f )
+				{
+					attackSpeed = 0.1f;
+				}
+				return attackSpeed;
+			} else if ( Parent is EnemyShip enemyShip )
+			{
+				return enemyShip.AttackSpeed;
+			}
+			return 0;
+		}
+
+		public void PlaySoundOnClient()
+		{
+
+		}
+
+		public override List<Upgrade> GetUpgrades()
+		{
+			var upgrades = base.GetUpgrades();
+			foreach(var i in upgrades)
+			{
+
+			}
+
+			return upgrades;
+		}
+
+		[ClientRpc]
+		public void PlaySoundOnClient( string name )
+		{
+			PlaySound( name );
+		}
+	}
+}

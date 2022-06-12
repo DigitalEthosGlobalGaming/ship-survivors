@@ -1,0 +1,5 @@
+C:\Program Files (x86)\Steam\steamapps\common\sbox\addons\sky_survivors\code\obj\Debug\sky_survivors.csproj.AssemblyReference.cache
+C:\Program Files (x86)\Steam\steamapps\common\sbox\addons\sky_survivors\code\obj\Debug\sky_survivors.GeneratedMSBuildEditorConfig.editorconfig
+C:\Program Files (x86)\Steam\steamapps\common\sbox\addons\sky_survivors\code\obj\Debug\sky_survivors.AssemblyInfoInputs.cache
+C:\Program Files (x86)\Steam\steamapps\common\sbox\addons\sky_survivors\code\obj\Debug\sky_survivors.AssemblyInfo.cs
+C:\Program Files (x86)\Steam\steamapps\common\sbox\addons\sky_survivors\code\obj\Debug\sky_survivors.csproj.CoreCompileInputs.cache
