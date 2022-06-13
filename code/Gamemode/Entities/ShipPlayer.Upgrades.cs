@@ -26,6 +26,20 @@ namespace ShipSurvivors
 			Event.Run( "ss.upgrades-to-buy.change" );
 		}
 
+
+		public float GetUpgradeLevel(string className)
+		{
+			var upgrades = GetUpgrades();
+
+			foreach(var i in upgrades)
+			{
+				if (i.ClassName == className )
+				{
+					return i.Level;
+				}
+			}
+			return 0;
+		}
 		public void OnUpgradesChanged( List<Upgrade> before, List<Upgrade> next)
 		{
 			Upgrades = next;
@@ -173,6 +187,25 @@ namespace ShipSurvivors
 			return null;
 		}
 
+		public void OnEnemyDamaged(Entity source, EnemyShip enemy, bool didKill)
+		{
+			if ( Upgrades == null )
+			{
+				Upgrades = new List<Upgrade>();
+			}
+			
+			foreach ( var upgrade in Upgrades )
+			{
+				if ( upgrade?.IsValid() ?? false )
+				{
+					if ( upgrade.Active )
+					{
+						upgrade.OnEnemyDamaged( source, enemy, didKill );
+					}
+				}
+			}
+		}
+
 		public void UpdateStats()
 		{
 			if ( Upgrades  == null)
@@ -186,7 +219,7 @@ namespace ShipSurvivors
 			TurnSpeed = 1f;
 			MaxSpeed = 50f;
 			AttackSpeed = 0;
-			UpgradeAmount = 5;
+			UpgradeAmount = 3;
 
 			foreach ( var upgrade in Upgrades )
 			{

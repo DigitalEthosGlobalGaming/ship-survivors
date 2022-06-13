@@ -44,26 +44,5 @@ namespace ShipSurvivors
 			return 0;
 		}
 
-		public void PlaySoundOnClient()
-		{
-
-		}
-
-		public override List<Upgrade> GetUpgrades()
-		{
-			var upgrades = base.GetUpgrades();
-			foreach(var i in upgrades)
-			{
-
-			}
-
-			return upgrades;
-		}
-
-		[ClientRpc]
-		public void PlaySoundOnClient( string name )
-		{
-			PlaySound( name );
-		}
 	}
 }

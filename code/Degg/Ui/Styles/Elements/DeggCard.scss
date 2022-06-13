@@ -4,8 +4,10 @@
 .card {
     font-family: $font-base;
     padding: 4px;
+    flex: 1;
 
     .card-inner {
+        flex: 1;
         display: flex;
         flex-direction: column;
         color: white;
@@ -27,6 +29,12 @@
     }
 
     .card-body {
+        font-size: $font-size-small;
+        padding: 8px;
+    }
+
+    .card-footer {
+        font-style: initial;
         font-size: $font-size-xsmall;
         padding: 8px;
     }

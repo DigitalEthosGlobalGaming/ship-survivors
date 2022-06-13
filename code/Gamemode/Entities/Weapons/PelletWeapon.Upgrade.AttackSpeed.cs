@@ -5,12 +5,12 @@ using Sandbox;
 namespace ShipSurvivors
 {
 
-	public partial class PelletWeaponUpgradeBulletSize : WeaponUpgrade 
+	public partial class PelletWeaponUpgradeAttackSpeed : WeaponUpgrade 
 	{
 
 		public override string ParentUpgradeClassName { get; set; } = "PelletWeapon";
-		public override string UpgradeName { get; set; } = "Pim Rounds";
-		public override string Description { get; set; } = "Increases Projectile Size";
+		public override string UpgradeName { get; set; } = "Lubricated Chambers";
+		public override string Description { get; set; } = "Increases Attack Speed";
 		public override string Image { get; set; } = "";
 		public override float Rarity { get; set; } = 1;
 
@@ -23,10 +23,10 @@ namespace ShipSurvivors
 		public override void OnOwnerStatsUpdate()
 		{
 			base.OnOwnerStatsUpdate();
-			var weapon = GetWeapon<PelletWeapon>();
-			if ( weapon?.IsValid() ?? false )
+			var player = base.GetShipPlayer();
+			if ( player?.IsValid() ?? false )
 			{
-				weapon.AttackBulletSize = weapon.AttackBulletSize + 0.25f;
+				player.AttackSpeed = player.AttackSpeed + 0.1f;
 			}
 		}
 

@@ -15,6 +15,7 @@ namespace ShipSurvivors
 		public RoundState PreviousRoundState { get; set; }
 		public Panel Cards { get; set; }
 		public Panel CardIcons { get; set; }
+		public ShipCrosshair Crosshair { get; set; }
 		public bool HasUpgradesToBuy { get; set; }
 
 		public UpgradePanel()
@@ -32,6 +33,9 @@ namespace ShipSurvivors
 			UpgradeModal = AddChild<Panel>( "upgrade-panel" );
 			Cards = UpgradeModal.AddChild<Panel>( "inner" ).AddChild<Panel>( "cards" );
 			UpgradeIconsPanel = AddChild<Panel>("upgrade-icons-panel");
+
+			Crosshair = AddChild<ShipCrosshair>();
+
 		}
 
 		public List<Upgrade> GetUpgradesToBuy()
@@ -80,14 +84,13 @@ namespace ShipSurvivors
 
 			foreach ( var upgrade in upgrades )
 			{
-				if ( !icons.ContainsKey(upgrade.Name))
+				if ( !icons.ContainsKey(upgrade.UpgradeName))
 				{
 					var element = CardIcons.AddChild<UpgradeIconElement>();
-					icons[upgrade.Name] = element;
+					icons[upgrade.UpgradeName] = element;
 				}
-				icons[upgrade.Name].Amount = icons[upgrade.Name].Amount + 1;
+				icons[upgrade.UpgradeName].Amount = icons[upgrade.UpgradeName].Amount + 1;
 			}
-			AdvLog.Info( upgrades );
 		}
 
 		[Event( "ss.upgrades-to-buy.change" )]
@@ -148,7 +151,10 @@ namespace ShipSurvivors
 				OnRoundChange();
 			}
 
-			UpgradeModal.SetClass( "hidden", roundManager.State != RoundState.Ended || !HasUpgradesToBuy );
+			var isOpen = roundManager.State != RoundState.Ended || !HasUpgradesToBuy;
+
+			Crosshair.SetClass("hidden", !isOpen );
+			UpgradeModal.SetClass( "hidden", isOpen );
 
 			switch ( roundManager.State )
 			{

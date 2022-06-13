@@ -7,15 +7,16 @@ namespace ShipSurvivors
 
 	public partial class PelletWeaponUpgradeBulletSpeed : WeaponUpgrade 
 	{
+
+		public override string ParentUpgradeClassName { get; set; } = "PelletWeapon";
+		public override string UpgradeName { get; set; } = "Electrified Barrels";
+		public override string Description { get; set; } = "Increases Projectile Speed";
+		public override string Image { get; set; } = "";
+		public override float Rarity { get; set; } = 1;
 		public override void Spawn()
 		{
 			base.Spawn();
 			Transmit = TransmitType.Owner;
-			Rarity = 1;
-			Name = "Electrified Barrels";
-			ParentUpgradeClassName = "PelletWeapon";
-			Description = "Increases Projectile Speed";
-			Image = "";
 			Active = false;
 		}
 

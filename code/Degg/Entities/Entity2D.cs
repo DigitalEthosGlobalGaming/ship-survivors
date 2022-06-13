@@ -121,6 +121,12 @@ namespace Degg.Entities
 			return GetRotationLookingAt( pos.x, pos.y, rotateAmount, degreeOffset );
 		}
 
+		public void SetVelocityFromAngle(float degrees, float amount)
+		{
+			var velocity = Vector2.FromRadian( (float)(degrees * Math.PI) / 180f ) * amount;
+			Velocity = Velocity.WithX( velocity.x ).WithY( velocity.y );
+		}
+
 		public Rotation GetRotationLookingAt( float x, float y, float? rotateAmount, float degreeOffset = 90f )
 		{
 			x = x - Position.x;

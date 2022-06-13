@@ -113,11 +113,6 @@ namespace ShipSurvivors
 
 			if ( IsServer )
 			{
-				DebugOverlay.Circle( cursor + Position, Rotation.FromAxis( Vector3.Right, 90 ), 5f, Color.Red.WithAlpha( 0.5f ) );
-			}
-
-			if ( IsServer )
-			{
 				if ( Input.Down( InputButton.PrimaryAttack ) )
 				{
 					FireBullet();

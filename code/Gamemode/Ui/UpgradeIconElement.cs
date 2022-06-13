@@ -12,12 +12,11 @@ namespace ShipSurvivors
 		{
 			StyleSheet.Load( "/Gamemode/Ui/UpgradeIconElement.scss" );
 			var Base = AddChild<Panel>( "upgrade-icon-container" );
-			var Inner = Base.AddChild<Panel>(  );
+			var Inner = Base.AddChild<Panel>();
 
 			Inner.AddClass( "upgrade-icon" );
 			AmountLabel = Inner.AddChild<Label>();
 		}
-
 
 		public void SetElementsInformation()
 		{

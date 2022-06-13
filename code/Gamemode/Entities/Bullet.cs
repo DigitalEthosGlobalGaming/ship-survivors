@@ -8,9 +8,12 @@ namespace ShipSurvivors
 		public int Strength { get; set; }
 		public float LastStrenghtLostTick { get; set; }
 		public float DeathTime { get; set; }
+		public float Damage { get; set; }
+
 		public override void Spawn()
 		{
 			base.Spawn();
+			Damage = 1;
 			SetShape(Entity2DShapes.Circle);
 			Scale = 0.5f;
 			EntityMaterial = "materials/bullets/bullet_1.vmat";
@@ -35,6 +38,18 @@ namespace ShipSurvivors
 			}
 		}
 
+		public ShipPlayer GetShipPlayer()
+		{
+			if ( Owner is ShipWeapon w )
+			{
+				Owner = w.GetShipPlayer();
+			} else if (Owner is ShipPlayer player)
+			{
+				return player;
+			}
+			return null;
+		}
+
 
 		public override void StartTouch( Entity other )
 		{
@@ -49,9 +64,9 @@ namespace ShipSurvivors
 			}
 			if ( Owner != null )
 			{
-				if ( Owner is ShipWeapon weapon )
+				if ( Owner is ShipWeapon w )
 				{
-					Owner = weapon.GetShipPlayer();
+					Owner = w.GetShipPlayer();
 				}
 
 				if ( Owner == other )
@@ -59,30 +74,49 @@ namespace ShipSurvivors
 					return;
 				}
 
-
 				if ( other is ShipPlayer player )
 				{
 					this.Delete();
 					var damage = new DamageInfo();
 					damage.Attacker = Owner;
-					damage.Damage = 1f;
+					damage.Damage = Damage;
 					damage.Position = Position;
 					player.TakeDamage( damage );
 					EmitSound( "player.ship.damage" );
-				} else if (other is Bullet bullet)
+					return;
+				} 
+				if (other is Bullet bullet)
 				{
-					LoseStrength();
-					bullet.LoseStrength();
+					if ( Owner != bullet.GetShipPlayer() )
+					{
+						LoseStrength();
+						bullet.LoseStrength();
+						return;
+					}
 				}
-				else if ( other is Entity2D entity2D )
+				if ( other is EnemyShip enemy )
 				{
-					var damage = new DamageInfo();
-					damage.Attacker = Owner;
-					damage.Damage = 1f;
-					damage.Position = Position;
-					entity2D.TakeDamage( damage );
-					EmitSound( "enemy.ship.damage" );
-					this.Delete();
+					if ( other.Health > 0 )
+					{
+						var damage = new DamageInfo();
+						damage.Attacker = Owner;
+						damage.Damage = Damage;
+						damage.Position = Position;
+						enemy.TakeDamage( damage );
+						if ( Owner != null && Owner is ShipPlayer ownerPlayer )
+						{
+							bool didKill = false;
+							if ( enemy.Health <= 0 )
+							{
+								didKill = true;
+							}
+							ownerPlayer.OnEnemyDamaged( this, enemy, didKill );
+						}
+
+						EmitSound( "enemy.ship.damage" );
+						this.Delete();
+						return;
+					}
 				}
 			}
 

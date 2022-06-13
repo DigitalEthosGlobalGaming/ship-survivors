@@ -5,65 +5,21 @@ using System.Collections.Generic;
 
 namespace ShipSurvivors
 {
-
-	public partial class UpgradeStoreItem {
-		public string Name { get; set; }
-		public string UpgradeClassName { get; set; }
-		public string Description { get; set; }
-		public float Rarity { get; set; }
-		public string Image { get; set; }
-
 	
-
-		public static UpgradeStoreItem CreateItem(string name, string className, string description, float rarity, string image = "" )
-		{
-			var item = new UpgradeStoreItem();
-
-			item.Name = name;
-			item.UpgradeClassName = className;
-			item.Description = description;
-			item.Image = image;
-			item.Rarity = rarity;
-			return item;
-		}
-
-		public Upgrade Create()
-		{
-			var upgrade = TypeLibrary.Create<Upgrade>( UpgradeClassName );
-			upgrade.Name = Name;
-			upgrade.Description = Description;
-			upgrade.Rarity = Rarity;
-			upgrade.Image = Image;
-
-			return upgrade;
-		}
-
-	}
-
 	public partial class Upgrade : Entity 
 	{
-		public static string[] Upgrades =  {
-
-			"degg/models/simple/platform_1x1.vmdl",
-			"degg/models/simple/platform_1x1_thin.vmdl",
-			"degg/models/simple/platform_2x1.vmdl",
-			"degg/models/simple/platform_2x1_thin.vmdl",
-			"degg/models/simple/platform_2x2.vmdl",
-			"degg/models/simple/platform_2x2_thin.vmdl"
+		public static string[] Upgrades { get; set; } =
+		{
+			"",""
 		};
+		public virtual float Rarity { get; set; } = 1;
+		public virtual string Image { get; set; } = "";
+		public virtual string UpgradeName { get; set; } = "";
+		public virtual string Description { get; set; } = "";
+		public virtual string ParentUpgradeClassName { get; set; } = "";
 
 		[Net]
 		public Upgrade ParentUpgrade { get; set; }
-
-		[Net]
-		public string Image { get; set; }
-		[Net]
-		public string Description { get; set; }
-		[Net]
-		public float Rarity { get; set; }
-
-		[Net]
-		public string ParentUpgradeClassName { get; set; }
 
 		[Net]
 		public float Level { get; set; }
@@ -74,12 +30,21 @@ namespace ShipSurvivors
 		public override void Spawn()
 		{
 			base.Spawn();
+			ClientOrServerSpawn();
 			Transmit = TransmitType.Owner;
-			Rarity = 1;
 			Level = 1;
-			Description = "Upgrade";
-			Image = "";
 			Active = false;
+		}
+
+		public override void ClientSpawn()
+		{
+			base.ClientSpawn();
+			ClientOrServerSpawn();
+		}
+
+		public virtual void ClientOrServerSpawn()
+		{
+
 		}
 
 
@@ -93,11 +58,43 @@ namespace ShipSurvivors
 
 		}
 
-		public virtual List<Upgrade> GetUpgrades()
+		public virtual string[] GetUpgradeClassNames()
 		{
-			return new List<Upgrade>();
+			return new string[0];
 		}
 
+		public virtual List<Upgrade> GetUpgrades()
+		{
+			List<Upgrade> upgrades = new List<Upgrade>();
+			var classNames = GetUpgradeClassNames();
+			foreach(var className in classNames)
+			{
+				var entity = CreateByName<Upgrade>( className );
+				if ( !(entity.ParentUpgrade?.IsValid() ?? false))
+				{
+					entity.ParentUpgrade = this;
+				}
+
+				upgrades.Add( entity );
+			}
+
+			return upgrades;
+		}
+
+
+		public virtual T GetFirstParentUpgrade<T>() where T: Upgrade
+		{
+			var parent = GetParentUpgrade();
+			if (parent == null)
+			{
+				return null;
+			}
+			if (parent is T t)
+			{
+				return t;
+			}
+			return parent.GetFirstParentUpgrade<T>();
+		}
 		public ShipPlayer GetShipPlayer()
 		{
 			if (Owner is ShipPlayer player)
@@ -168,6 +165,15 @@ namespace ShipSurvivors
 			return $"{Name}";
 		}
 
+		[ClientRpc]
+		public void PlaySoundOnClient( string name )
+		{
+			PlaySound( name );
+		}
 
+		public virtual void OnEnemyDamaged( Entity b, EnemyShip e, bool didKill )
+		{
+
+		}
 	}
 }
