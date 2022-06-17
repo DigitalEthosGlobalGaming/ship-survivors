@@ -1,0 +1,48 @@
+﻿
+@keyframes anim-flicker
+{
+    0% {
+        color: rgba(81, 211, 213,1);
+    }
+    10% {
+        color: rgba(81, 211, 213, 1);
+    }
+    20% {
+        color: rgba(81, 211, 213,0.3);
+    }
+    30% {
+        color: rgba(81, 211, 213, 1);
+    }
+    40% {
+        color: rgba(81, 211, 213,0.3);
+    }
+    50% {
+        color: rgba(81, 211, 213,0.3);
+    }
+    60% {
+        color: rgba(81, 211, 213, 1);
+    }
+    70% {
+        color: rgba(81, 211, 213, 1);
+    }
+    80% {
+        color: rgba(81, 211, 213,0.3);
+    }
+    90% {
+        color: rgba(81, 211, 213, 1);
+    }
+    100% {
+        color: rgba(81, 211, 213, 1);
+    }
+}
+
+
+.simple-game-menu-header {
+    animation-name: anim-flicker;
+    animation-duration: 2s;
+    animation-iteration-count: 1;
+}
+
+.game-menu-item {
+    font-size: $font-size-large;
+}

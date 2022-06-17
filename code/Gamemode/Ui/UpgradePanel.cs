@@ -34,6 +34,8 @@ namespace ShipSurvivors
 			Cards = UpgradeModal.AddChild<Panel>( "inner" ).AddChild<Panel>( "cards" );
 			UpgradeIconsPanel = AddChild<Panel>("upgrade-icons-panel");
 
+			AddChild<PlayerHealthElement>();
+
 			Crosshair = AddChild<ShipCrosshair>();
 
 		}
@@ -54,10 +56,12 @@ namespace ShipSurvivors
 		{
 			List<Upgrade> upgrades = new List<Upgrade>();
 			var player = ClientUtil.GetPawn<ShipPlayer>();
-
-			foreach ( var upgrade in player.Upgrades )
+			if ( player?.IsValid() ?? false )
 			{
-				upgrades.Add( upgrade );
+				foreach ( var upgrade in player.Upgrades )
+				{
+					upgrades.Add( upgrade );
+				}
 			}
 			return upgrades;
 		}
@@ -89,6 +93,7 @@ namespace ShipSurvivors
 					var element = CardIcons.AddChild<UpgradeIconElement>();
 					icons[upgrade.UpgradeName] = element;
 				}
+				icons[upgrade.UpgradeName].Texture = upgrade.Image;
 				icons[upgrade.UpgradeName].Amount = icons[upgrade.UpgradeName].Amount + 1;
 			}
 		}

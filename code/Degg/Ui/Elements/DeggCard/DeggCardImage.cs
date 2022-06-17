@@ -14,7 +14,6 @@ namespace Degg.UI.Elements
 			RemoveClass( "card-image-container" );
 			if ( src != null && src.Length > 0 )
 			{
-
 				AddClass( "card-image-container" );
 				DeleteChildren();
 				var Image = AddChild<Image>();

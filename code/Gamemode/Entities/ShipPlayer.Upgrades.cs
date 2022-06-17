@@ -11,6 +11,7 @@ namespace ShipSurvivors
 		public float Damage { get; set; }
 		public float MovementSpeed { get; set; }
 		public float AttackSpeed { get; set; }
+		[Net]
 		public float MaxHealth { get; set; }
 		public float UpgradeAmount { get; set; }
 
@@ -40,6 +41,11 @@ namespace ShipSurvivors
 			}
 			return 0;
 		}
+
+		public bool HasUpgrade(string className)
+		{
+			return GetUpgradeLevel( className ) > 0;
+		}
 		public void OnUpgradesChanged( List<Upgrade> before, List<Upgrade> next)
 		{
 			Upgrades = next;
@@ -65,15 +71,30 @@ namespace ShipSurvivors
 		{
 			DeleteNonActiveUpgrades();
 			var upgrades = GetUpgradesToBuy();
-			
-			for ( int i = 0; i < UpgradeAmount; i++ )
-			{
-				var newUpgrade = Rand.FromList(upgrades);
-				newUpgrade.Owner = this;
-				newUpgrade.Active = true;
+			var amountAdded = UpgradeAmount;
+			var maxTries = 1000;
 
-				UpgradesToBuy.Add( newUpgrade );
+			var newUpgrades = new List<Upgrade>(UpgradesToBuy);
+			while ( amountAdded > 0 && maxTries > 0 )
+			{
+				maxTries = maxTries - 1;
+
+
+				var newUpgrade = Rand.FromList( upgrades );
+				var isExistingUpgrade = newUpgrades.Find( ( item ) =>item.ClassName == newUpgrade.ClassName)?.IsValid ?? false;
+
+				if (!isExistingUpgrade )
+				{
+					amountAdded = amountAdded - 1;
+					newUpgrade.Owner = this;
+					newUpgrade.Active = true;
+					newUpgrades.Add( newUpgrade );
+				}
 			}
+
+			UpgradesToBuy = newUpgrades;
+
+
 		}
 
 		public virtual List<Upgrade> GetUpgradesToBuy()
@@ -214,7 +235,7 @@ namespace ShipSurvivors
 			}
 
 			Damage = 1;
-			MaxHealth = 100;
+			MaxHealth = 10;
 			MovementSpeed = 1;
 			TurnSpeed = 1f;
 			MaxSpeed = 50f;

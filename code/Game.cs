@@ -3,6 +3,7 @@ using Degg.Entities;
 using Degg.Util;
 using ShipSurvivors;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 //
@@ -28,6 +29,11 @@ namespace Sandbox
 				return myGame.Rounds;
 			}
 			return null;
+		}
+
+		public static float GetDifficulty()
+		{
+			return GetRoundManager().Difficulty.Difficulty;
 		}
 
 		[Net]
@@ -58,9 +64,17 @@ namespace Sandbox
 		[Event.Tick.Server]
 		public void OnTick()
 		{
-			var clients = Client.All.Any();
+			var isPlayer = false;
+			var clients = Client.All.AsEnumerable<Client>();
+			foreach ( var c in clients ) {
+				if (c.Pawn is ShipPlayer)
+				{
+					isPlayer = true;
+					break;
+				}
+			}
 
-			if ( clients )
+			if ( isPlayer )
 			{
 				if ( Rounds != null )
 				{

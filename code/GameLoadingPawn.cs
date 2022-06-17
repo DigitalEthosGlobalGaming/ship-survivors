@@ -1,11 +1,6 @@
 ﻿using Degg;
 using Degg.Entities;
 using Sandbox;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ShipSurvivors
 {
@@ -15,7 +10,7 @@ namespace ShipSurvivors
 		public override void HudSetup()
 		{
 			base.HudSetup();
-			Hud.AddPanel<ShipSelectorPanel>();
+			Hud.AddPanel<GameMenuPanel>();
 		}
 
 		[ConCmd.Server( "ss.client.loaded" )]

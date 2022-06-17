@@ -1,4 +1,5 @@
 ﻿
+using Degg.Cameras;
 using Degg.Entities;
 using Degg.Util;
 using Sandbox;
@@ -22,7 +23,6 @@ namespace ShipSurvivors
 
 		public float MouseSensitivity { get; set; }
 
-
 		[Net]
 		public Rotation TargetRotation { get; set; }
 
@@ -31,7 +31,8 @@ namespace ShipSurvivors
 		{
 			base.Spawn();
 			Init();
-
+			MaxHealth = 10f;
+			Health = 10f;
 		}
 
 		public override void Respawn()
@@ -58,6 +59,10 @@ namespace ShipSurvivors
 		public override void OnKilled()
 		{
 			base.OnKilled();
+			Delete();
+			var pawn = CreateByName<DeadPlayerPawn>( "DeadPlayerPawn" );
+			Client.Pawn = pawn;
+			pawn.RoundsSurvived = MyGame.GetRoundManager().Difficulty.Difficulty;
 		}
 
 
@@ -66,16 +71,17 @@ namespace ShipSurvivors
 			UpdateStats();
 		}
 
-		public void FireBullet(bool force = false )
+		public void FireBullet()
 		{
 			if (IsServer)
 			{
-				foreach(var i in Upgrades)
+				foreach (var i in Upgrades)
 				{
 					i.Fire();
 				}
 			}
 		}
+
 
 
 		public override void BuildInput( InputBuilder input )
@@ -118,25 +124,30 @@ namespace ShipSurvivors
 					FireBullet();
 				}
 
-				if ( Input.Pressed( InputButton.Slot1 ) )
+				if ( Input.Pressed( InputButton.Slot9 ) )
 				{
 					var round = MyGame.GetRoundManager();
 					round.EndRound();
 				}
-				if ( Input.Pressed( InputButton.Slot2 ) )
-				{
-					var round = MyGame.GetRoundManager();
-					round.StartRound();
+				if ( Input.Pressed( InputButton.Slot8 ) )
+				{					
+					TakeDamage( new DamageInfo()
+					{
+						Damage = 100000
+					} );
 				}
 
 			}
 
 			if ( IsServer )
 			{
-
 				var currentSpeed = Velocity.Distance( Vector3.Zero );
 				var isMoving = false;
 
+				if ( !(PhysicsBody?.IsValid() ?? false))
+				{
+					return;
+				}
 				if ( currentSpeed < MaxSpeed )
 				{
 					var force = Vector3.Zero;
@@ -203,8 +214,18 @@ namespace ShipSurvivors
 			PlaySound( name );
 		}
 
+		[ClientRpc]
+		public void ScreenShakeOnClient( float amount )
+		{
+			var camera = GetCamera<TopdownCamera>();
+			if (camera != null)
+			{
+				camera.Shake( amount );
+			}
+		}
 
-		
+
+
 
 
 	}

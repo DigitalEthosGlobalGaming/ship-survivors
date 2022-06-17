@@ -14,7 +14,7 @@ namespace ShipSurvivors
 
 		public UpgradeItemElement() : base()
 		{
-
+			AddClass( "upgrade-icon-card" );
 		}
 
 		public void SetUpgrade( Upgrade upgrade )
@@ -28,12 +28,6 @@ namespace ShipSurvivors
 			ShipPlayer.BuyUpgradeConCommand( Upgrade.ClassName );
 		}
 
-		public override void CreateSubElements()
-		{
-			base.CreateSubElements();
-
-		}
-
 		public override void OnDeleted()
 		{
 			base.OnDeleted();
@@ -41,6 +35,11 @@ namespace ShipSurvivors
 			{
 				ParentUpgrade.Delete();	
 			}
+		}
+
+		public override DeggCardFooter CreateFooterElement()
+		{
+			return Inner.AddChild<UpgradeCardFooter>();
 		}
 
 		public void SetElementsInformation()
@@ -58,19 +57,23 @@ namespace ShipSurvivors
 
 				if ( Header != null )
 				{
-					Log.Info( ParentUpgrade.Image );
 					Header.SetText( Upgrade.UpgradeName );
 				}
 				if ( Body != null )
 				{
+					
 					Body.SetText( Upgrade.Description );
 				}
-				if (Footer != null)
-				{				
 
+				if ( Image != null )
+				{
+					Image.SetImage( Upgrade.Image );
+				}
+				if (Footer != null && Footer is UpgradeCardFooter ucf)
+				{
 					if ( ParentUpgrade != null)
 					{
-						Footer.SetText( "Upgrade for " + ParentUpgrade.UpgradeName );
+						ucf.SetUpgrade( Upgrade );
 					}
 
 				}

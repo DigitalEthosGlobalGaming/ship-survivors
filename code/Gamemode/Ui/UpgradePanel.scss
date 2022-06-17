@@ -1,5 +1,7 @@
 ﻿@import "/Degg/Ui/Styles/variables.scss";
 
+$background-gradient2: linear-gradient(to bottom, #0F1C21 0%, #132935 100%);
+
 .upgrade-panel {
     pointer-events: all;
     position: absolute;
@@ -50,6 +52,8 @@
     bottom: 0;
     height: 40px;
 }
+
+
 .icons {
     flex-direction: row;
     align-content: center;
@@ -62,5 +66,27 @@
     pointer-events:none;
     display: none;
 }
+
+
+.player-health-element {
+    width: 100vw;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    justify-content: flex-end;
+
+    .player-health-element-label {
+        color: rgb(81, 211, 213);
+        padding: 32px;
+        border-radius: $border-radius;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+        border-top-right-radius: 0;
+        background: $background-gradient2;
+        font-size: $font-size-medium;
+    }
+}
+
+
 
 @import "/Gamemode/Ui/styles.scss";

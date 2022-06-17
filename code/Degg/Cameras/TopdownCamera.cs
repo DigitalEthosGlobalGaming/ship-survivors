@@ -18,6 +18,12 @@ namespace Degg.Cameras {
 		public float MaxDistance => 150.0f;
 		public float DistanceStep => 10.0f;
 
+		public float ShakeAmount { get; set; }
+
+		public float NextShake { get; set; }
+
+		public Vector3 TargetPosition { get; set; }
+
 		public bool MatchRotation { get; set; }
 
 		public override void Build( ref CameraSetup camSetup )
@@ -27,18 +33,20 @@ namespace Degg.Cameras {
 			camSetup.Rotation = Rotation;
 		}
 
+		public void Shake( float amount )
+		{
+			ShakeAmount = amount;
+			Position = Position.WithX( Position.x + Rand.Float( -amount, amount ) ).WithY( Position.y +  Rand.Float( -amount, amount ) );
+		}
 		public override void Update()
 		{
-			Vector3 position = Vector3.Zero;
-
 			if ( Entity?.IsValid() ?? false )
 			{
-
-
-				position = Entity.Position;
-
+				TargetPosition = Entity.Position;
 			}
-			Position = position + Vector3.Up * Distance;
+
+			TargetPosition = TargetPosition + Vector3.Up * Distance;
+			Position = Position.LerpTo( TargetPosition, 15f * Time.Delta );
 			TargetRotation = Rotation.FromPitch( 90 );
 
 

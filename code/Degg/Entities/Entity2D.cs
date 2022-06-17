@@ -100,7 +100,7 @@ namespace Degg.Entities
 			Rotation = rotation;
 		}
 
-		public void LookAt( Vector3 position, float? rotateAmount = null)
+		public virtual void LookAt( Vector3 position, float? rotateAmount = null)
 		{
 			LookAt( position.x, position.y, rotateAmount );
 

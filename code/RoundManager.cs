@@ -4,6 +4,7 @@ using Degg.Utils;
 using Sandbox;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ShipSurvivors
 {
@@ -13,15 +14,18 @@ namespace ShipSurvivors
 		public DifficultySystem Difficulty { get; set;}
 
 		public List<EnemyShip> Enemies { get; set; }
+		public List<string> EnemiesThatCanSpawn { get; set; }
+
+		public Dictionary<int,string> BossRounds { get; set; }
 
 		public float NextEnemySpawn { get; set; }
 		public float SpawnRate { get; set; }
 		public float SpawnAmount { get; set; }
-		public int EnemiesSpawned { get; set; }
+		public int MaxEnemiesAlive { get; set; }
 
 		public Timer CheckEnemiesTimer { get; set; }
 
-		public float EnemiesAlive { get; set; }
+		public float EnemiesToKill { get; set; }
 
 		public bool HasStarted { get; set; }
 
@@ -33,44 +37,185 @@ namespace ShipSurvivors
 			Transmit = TransmitType.Always;
 			if ( IsServer )
 			{
-				Difficulty = new DifficultySystem();
-				Difficulty.AddItem( "EnemiesSpawned", 2 );
-				Difficulty.AddItem( "SpawnAmount", 1 );
-				Enemies = new List<EnemyShip>();
-				CheckEnemiesTimer = new Timer( CheckEnemies, 1000f );
-				CheckEnemiesTimer.Start();
+				Reset();
 			}
 		}
 
-		public void CheckEnemies( Timer t )
+		public void UpdateEnemiesThatCanSpawn()
+		{
+			int d = (int)Difficulty.Difficulty;
+			var spawnCombinations = new Dictionary<int, string>();
+
+			var isTesting = false;
+
+			if ( isTesting )
+			{
+				spawnCombinations[2] = "BossLevel1";
+				
+			} else {
+				spawnCombinations[1] = "CollisionEnemyShip";
+				spawnCombinations[2] = "EnemyFighter";
+				spawnCombinations[3] = "EnemyFighter";
+				spawnCombinations[4] = "CollisionEnemyShip";
+				spawnCombinations[5] = "CollisionEnemyShip";
+				spawnCombinations[6] = "EnemyFighter";
+				spawnCombinations[7] = "CollisionEnemyShip";
+				spawnCombinations[8] = "EnemyFighterV2";
+				spawnCombinations[9] = "EnemyFighter";
+				spawnCombinations[10] = "CollisionEnemyShip";
+				spawnCombinations[11] = "EnemyFighterV2";
+				spawnCombinations[12] = "EnemyFighterV2";
+				spawnCombinations[14] = "EnemyFighterV2";
+				spawnCombinations[15] = "EnemyShipLevel3";
+				spawnCombinations[16] = "EnemyFighterV2";
+				spawnCombinations[17] = "EnemyShipLevel3";
+				spawnCombinations[18] = "EnemyFighterV2";
+				spawnCombinations[19] = "EnemyFighterV2";
+				spawnCombinations[20] = "CollisionEnemyShipLevel2";
+				spawnCombinations[21] = "EnemyFighterV2";
+				spawnCombinations[25] = "CollisionEnemyShipLevel2";
+				spawnCombinations[26] = "CollisionEnemyShipLevel2";
+				spawnCombinations[27] = "CollisionEnemyShipLevel2";
+				spawnCombinations[28] = "EnemyFighterLevel3";
+				spawnCombinations[29] = "EnemyFighterLevel3";
+				spawnCombinations[30] = "EnemyFighterLevel3";
+				spawnCombinations[31] = "EnemyFighterLevel3";
+				spawnCombinations[32] = "EnemyFighterLevel3";
+				spawnCombinations[33] = "EnemyFighterLevel3";
+				spawnCombinations[34] = "EnemyFighterLevel3";
+				spawnCombinations[35] = "EnemyFighterLevel3";
+			}
+
+
+			if (spawnCombinations.ContainsKey(d))
+			{
+				EnemiesThatCanSpawn.Add( spawnCombinations[d] );
+			}
+		}
+
+		public bool AreAllPlayersDead()
+		{
+			var shipPlayer = ShipPlayer.GetAllPlayers<ShipPlayer>();
+			var deadPlayers = ShipPlayer.GetAllPlayers<DeadPlayerPawn>();
+			if ( shipPlayer.Count() == 0 && deadPlayers.Count() > 0)
+			{
+				return true;
+			}
+			return false;
+		}
+		public bool AreAllPlayersDeadAndReady()
+		{
+
+			if ( AreAllPlayersDead())
+			{
+				var areAllReady = true;
+				var deadPlayers = ShipPlayer.GetAllPlayers<DeadPlayerPawn>();
+				if ( deadPlayers.Count > 0 )
+				{
+					foreach ( var i in deadPlayers )
+					{
+						if ( !i.ReadyToReset )
+						{
+							areAllReady = false;
+						}
+					}
+				}
+				return areAllReady;
+			}
+			return false;
+		}
+
+		public void CheckGameState( Timer t )
 		{
 			if ( IsServer )
 			{
-				var enemies = 0;
-				foreach ( var item in Enemies )
+				if (AreAllPlayersDead())
 				{
-					if ( item?.IsValid() ?? false )
+					EndRound();
+					State = RoundState.Warmup;
+					if (AreAllPlayersDeadAndReady())
 					{
-						enemies = enemies + 1;
+						var deadPlayers = ShipPlayer.GetAllPlayers<DeadPlayerPawn>();
+						foreach ( var i in deadPlayers )
+						{
+							i.Reset();
+						}
+
+						Reset();
 					}
 				}
-				EnemiesAlive = enemies;
+
+				if (State == RoundState.Warmup)
+				{
+					CheckRoundStart();
+				}
+				UpdateEnemiesAlive();
 			}
+		}
+
+		public void Reset()
+		{
+			if ( Difficulty == null)
+			{
+				Difficulty = new DifficultySystem();
+			}
+			if ( CheckEnemiesTimer == null )
+			{
+				CheckEnemiesTimer = new Timer( CheckGameState, 1000f );
+			}
+
+			Difficulty.SetDifficulty( 0 );
+			
+			Difficulty.AddItem( "MaxEnemiesAlive", 1.25f );
+			Difficulty.AddItem( "SpawnAmount", 1 );
+
+			Enemies = new List<EnemyShip>();
+
+			CheckEnemiesTimer.Start();
+
+			if ( BossRounds == null )
+			{
+				BossRounds = new Dictionary<int, string>();
+				BossRounds[30] = "BossLevel1";
+			}
+			EnemiesThatCanSpawn = new List<string>();
+
+		}
+
+		public void DeleteBullets()
+		{
+			var bullets = All.OfType<Bullet>();
+			foreach ( var item in bullets )
+			{
+				item.Delete();
+			}
+		}
+
+		public void DeleteEnemies()
+		{
+			var entities = All.OfType<EnemyShip>();
+			foreach ( var item in entities )
+			{
+				item.Delete();
+			}
+			Enemies = new List<EnemyShip>();
 		}
 
 		public void CheckRoundStart()
 		{
 			var players = DeggPlayer.GetAllPlayers<ShipPlayer>();
 			var canStart = true;
+			var isPlayers = false;
 			foreach ( var item in players )
 			{
+				isPlayers = true;
 				if (item.UpgradesToBuy.Count != 0)
 				{
 					canStart = false;
 				}
 			}
 
-			if ( canStart )
+			if ( canStart && isPlayers )
 			{
 				StartRound();
 			}
@@ -78,18 +223,29 @@ namespace ShipSurvivors
 
 		public override void OnRoundStart()
 		{
-			EnemiesSpawned = 0;
 			NextEnemySpawn = 0;
 			Difficulty.UpdateDifficulty( 1 );
-			EnemiesSpawned = (int) Difficulty.GetValue( "EnemiesSpawned", 1);
-			if ( EnemiesSpawned  < 2)
+			var d = (int) Difficulty.Difficulty;
+			MaxEnemiesAlive = (int) Difficulty.GetValue( "MaxEnemiesAlive", 2);
+			if ( MaxEnemiesAlive < 2)
 			{
-				EnemiesSpawned = 2;
+				MaxEnemiesAlive = 2;
 			}
 			SpawnAmount =  Difficulty.GetValue( "SpawnAmount", 0.5f );
 			SpawnRate = Difficulty.GetValue( "EnemySpawnRate", 2f );
-			EnemiesAlive = EnemiesSpawned;
+			EnemiesToKill = MaxEnemiesAlive * 2;
+			UpdateEnemiesThatCanSpawn();
 			base.OnRoundStart();
+			if ( BossRounds.ContainsKey( d ))
+			{
+				var bossSpawn = GetValidSpawnPoint();
+				if ( bossSpawn.HasValue )
+				{
+					var boss = CreateByName<EnemyShip>( BossRounds[d] );
+					boss.Position = bossSpawn.Value;
+					Enemies.Add( boss );
+				}
+			}
 
 			var players = DeggPlayer.GetAllPlayers<ShipPlayer>();
 			foreach ( var player in players )
@@ -102,6 +258,9 @@ namespace ShipSurvivors
 		public override void OnRoundEnd()
 		{
 			base.OnRoundEnd();
+			Log.Info( "YES" );
+			DeleteBullets();
+			DeleteEnemies();
 			var players = DeggPlayer.GetAllPlayers<ShipPlayer>();
 			foreach(var player in players)
 			{
@@ -111,18 +270,29 @@ namespace ShipSurvivors
 			NextRoundStartTime = Time.Now + 3000f;
 		}
 
+		public void UpdateEnemiesAlive()
+		{
+			var newEnemies = new List<EnemyShip>();
+			foreach ( var enemy in Enemies )
+			{
+				if ( !(enemy?.IsValid() ?? false) )
+				{
+					EnemiesToKill = EnemiesToKill - 1;
+				} else
+				{
+					newEnemies.Add( enemy );
+				}
+			}
+			Enemies = newEnemies;
+		}
+
 		public override bool CanRoundEnd()
 		{
-			if ( EnemiesSpawned == 0 && EnemiesAlive == 0 )
+			if ( EnemiesToKill <= 0)
 			{
 				return true;
 			}
 			return false;
-		}
-
-		public override void Tick()
-		{
-			base.Tick();
 		}
 
 		public override void OnEndTick()
@@ -137,9 +307,14 @@ namespace ShipSurvivors
 		{
 			if (NextEnemySpawn < Time.Now)
 			{
-				var spawnRate = 5f / Difficulty.Difficulty;
+				var spawnRate = 5f;
 				NextEnemySpawn = Time.Now + spawnRate;
+				
 				var spawnAmount = (int) Math.Ceiling(SpawnAmount);
+				if ( spawnAmount < 1)
+				{
+					spawnAmount = 1;
+				}
 				for ( int i = 0; i < spawnAmount; i++ )
 				{
 					SpawnEnemy();
@@ -156,7 +331,7 @@ namespace ShipSurvivors
 				if ( player?.IsValid() ?? false )
 				{
 					var randomDirection = Rand.Float( 0, 360 );
-					var distance = Rand.Float( 200, 300 );
+					var distance = Rand.Float( 150, 200 );
 					var position = player.Position + Rotation.FromAxis( Vector3.Up, randomDirection ).Forward * distance;
 
 					var closestPlayer = DeggPlayer.GetClosestPlayer<ShipPlayer>( position );
@@ -173,16 +348,15 @@ namespace ShipSurvivors
 			var spawnPosition = GetValidSpawnPoint();
 			if ( spawnPosition.HasValue)
 			{
-				if ( EnemiesSpawned > 0 )
+				if ( Enemies.Count() <= MaxEnemiesAlive )
 				{
-					EnemiesSpawned = EnemiesSpawned - 1;
-					var enemy = new EnemyShip();
+					string enemyClassName = Rand.FromList( EnemiesThatCanSpawn );
+					var enemy = CreateByName<EnemyShip>( enemyClassName );
 					enemy.Position = spawnPosition.Value;
 					Enemies.Add( enemy );
 				}
 			}
 		}
-
 	}
 
 }

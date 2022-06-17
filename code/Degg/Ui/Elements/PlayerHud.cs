@@ -36,6 +36,7 @@ namespace Degg.Ui
 		public virtual void OnSetup()
 		{
 			RootPanel.StyleSheet.Load( "/Degg/Ui/Styles/base.scss" );
+			RootPanel.AddClass( "degg-root" );
 			RootPanel.AddChild<ChatBox>();
 		}
 

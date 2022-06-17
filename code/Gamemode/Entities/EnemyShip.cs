@@ -19,8 +19,8 @@ namespace ShipSurvivors
 			Scale = 0.5f;
 			MaxSpeed = 50f;
 			Accelleration = 1f;
-			Health = 2f;
-			RenderColor = Color.Red;
+			Health = 3f;
+			RenderColor = Color.Black.WithRed(0.3f);
 			NextAttackTime = GetNextAttackTime();
 			AttackSpeed = 5f;
 		}
@@ -33,35 +33,19 @@ namespace ShipSurvivors
 
 		public virtual Bullet GetBullet()
 		{
-			var bullet = new Bullet
-			{
-				Owner = this,
-				Position = this.Position + this.Rotation.Forward * 5f,
-				Scale = 0.25f
-			};
-
-			var velocity = (Rotation.Forward * (25f));
-			bullet.PhysicsBody.Velocity = velocity;
-			bullet.RenderColor = Color.Red;
-
-			return bullet;
+			return null;
 		}
 
 		public virtual float GetNextAttackTime()
 		{
-			return Time.Now + AttackSpeed;
+			return Time.Now + (float)Rand.Float(AttackSpeed * 0.75f, AttackSpeed * 1.25f );
 		}
 
 		public virtual void TryShoot()
 		{
-			if (NextAttackTime < Time.Now)
-			{
-				var bullet = GetBullet();
-				OnShoot( bullet );
-				EmitSound( "enemy.weapon.fire1" );
-				NextAttackTime = GetNextAttackTime();
-			}
+
 		}
+
 		public virtual void OnShoot(Bullet b)
 		{
 
@@ -74,6 +58,14 @@ namespace ShipSurvivors
 			TryShoot();
 		}
 
+		public virtual Vector3 GetLookAtPosition()
+		{
+			if ( Target?.IsValid() ?? false )
+			{
+				return Target.Position;
+			}
+			return this.Position;
+		}
 		public virtual void MoveStep()
 		{
 			if ( Target?.IsValid() ?? false ) {
@@ -86,7 +78,7 @@ namespace ShipSurvivors
 				var forceDirection = GetRotationLookingAt( targetPosition ).Forward;
 				var distance = targetPosition.Distance( Position );
 
-				LookAt( targetV );
+				LookAt( GetLookAtPosition() );
 		
 				if ( distance < falloffDistance )
 				{
@@ -101,6 +93,23 @@ namespace ShipSurvivors
 			{
 				FindTarget();
 			}	
+		}
+
+		public override void StartTouch( Entity other )
+		{
+			base.StartTouch( other );
+			if (other is ShipPlayer player )
+			{
+				if ( IsServer )
+				{
+					OnShipPlayerCollision( player );
+				}
+			}
+		}
+
+		public virtual void OnShipPlayerCollision(ShipPlayer player)
+		{
+
 		}
 
 		public override void TakeDamage( DamageInfo info )

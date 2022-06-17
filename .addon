@@ -1,25 +1,29 @@
 {
   "Title": "Sky Survivors",
   "Type": "game",
-  "Org": "local",
+  "Org": "degg",
   "Ident": "sky_survivors",
   "Schema": 1,
   "HasAssets": true,
   "AssetsPath": "",
-  "ResourcePaths": [],
+  "ResourcePaths": [
+    "/raw/*",
+    "/fonts/*"
+  ],
   "HasCode": true,
   "CodePath": "/code/",
   "RootNamespace": "Sandbox",
   "Metadata": {
     "MapList": [
-      "facepunch.construct"
+      "degg.sky_survivor_map",
+      "sky_survivor_map"
     ],
     "PerMapRanking": false,
     "LeaderboardType": 0,
     "RankType": 0,
-    "MapSelect": 0,
-    "GameNetworkType": 0,
-    "MaxPlayers": 0,
-    "MinPlayers": 0
+    "MapSelect": 1,
+    "GameNetworkType": 1,
+    "MaxPlayers": 1,
+    "MinPlayers": 1
   }
 }

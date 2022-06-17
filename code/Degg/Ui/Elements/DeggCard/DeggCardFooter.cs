@@ -10,8 +10,6 @@ namespace Degg.UI.Elements
 		{
 			AddClass( "card-footer" );	
 		}
-
-
 		public void SetText( string str )
 		{
 			if ( Description  != null)

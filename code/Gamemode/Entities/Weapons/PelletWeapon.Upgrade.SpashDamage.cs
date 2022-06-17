@@ -11,7 +11,7 @@ namespace ShipSurvivors
 		public override string ParentUpgradeClassName { get; set; } = "PelletWeapon";
 		public override string UpgradeName { get; set; } = "Fragmenting Shells";
 		public override string Description { get; set; } = "Creates a smaller bullet in a random direction when killing an enemy";
-		public override string Image { get; set; } = "";
+		public override string Image { get; set; } = "/raw/crosshairs/green/crosshair161.png";
 		public override float Rarity { get; set; } = 1;
 		public override void Spawn()
 		{
@@ -26,8 +26,10 @@ namespace ShipSurvivors
 			bullet.Owner = source.Owner;
 			bullet.Position = position;
 			bullet.Scale = 0.2f;
+			bullet.DeathTime = Time.Now + 2f;
 			bullet.Strength = 0;
 			bullet.SetVelocityFromAngle( Rand.Float( -180, 180 ), 50f );
+			bullet.EntityMaterial = "materials/bullets/bullet_player_1.vmat";
 			PlaySoundOnClient( "ship.weapon.fire" );
 		}
 

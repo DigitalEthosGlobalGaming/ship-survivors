@@ -2,7 +2,7 @@
 
 namespace Degg.Ui
 {
-	public partial class WelcomePanel : Panel{
+	public partial class WelcomePanel : Panel {
 
 		public Panel Inner { get; set; }
 		public WelcomePanel()

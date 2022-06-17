@@ -50,6 +50,15 @@ namespace ShipSurvivors
 			return null;
 		}
 
+		public override void ServerTick()
+		{
+			base.ServerTick();
+			if ( DeathTime < Time.Now )
+			{
+				Delete();
+			}
+		}
+
 
 		public override void StartTouch( Entity other )
 		{
@@ -57,10 +66,6 @@ namespace ShipSurvivors
 			if ( IsClient )
 			{
 				return;
-			}
-			if ( DeathTime < Time.Now)
-			{
-				Delete();
 			}
 			if ( Owner != null )
 			{
@@ -84,10 +89,10 @@ namespace ShipSurvivors
 					player.TakeDamage( damage );
 					EmitSound( "player.ship.damage" );
 					return;
-				} 
+				}
 				if (other is Bullet bullet)
 				{
-					if ( Owner != bullet.GetShipPlayer() )
+					if ( GetShipPlayer() != bullet.GetShipPlayer() )
 					{
 						LoseStrength();
 						bullet.LoseStrength();
@@ -96,6 +101,11 @@ namespace ShipSurvivors
 				}
 				if ( other is EnemyShip enemy )
 				{
+					if (Owner is EnemyShip)
+					{
+						return;
+					}
+					
 					if ( other.Health > 0 )
 					{
 						var damage = new DamageInfo();
