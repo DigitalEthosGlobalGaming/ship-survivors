@@ -1,5 +1,6 @@
 ﻿using Sandbox;
 using System;
+using System.Linq;
 
 namespace Degg.Entities
 {
@@ -35,6 +36,37 @@ namespace Degg.Entities
 		{
 			base.Spawn();
 			SetModel( "models/base/mesh_10x10.vmdl" );
+		}
+
+		public T GetClosest<T>(float? min = null, float? max = null) where T: Entity2D
+		{
+			var entities = Entity2D.All.ToList();
+			float closestDistance = float.MaxValue;
+			T closest = null;
+			foreach( var entity in entities)
+			{
+				if ( entity != this )
+				{
+					if ( entity is T t )
+					{
+						if ( entity?.IsValid() ?? false )
+						{
+							var distance = Position.Distance( entity.Position );
+							var minD = min.GetValueOrDefault( distance );
+							var maxD = max.GetValueOrDefault( distance );
+							if ( distance >= minD && distance <= maxD )
+							{
+								if ( distance < closestDistance )
+								{
+									closestDistance = distance;
+									closest = t;
+								}
+							}
+						}
+					}
+				}
+			}
+			return closest;
 		}
 
 		public void SetShape( Entity2DShapes shape, float scale = 1f)
@@ -123,7 +155,7 @@ namespace Degg.Entities
 
 		public void SetVelocityFromAngle(float degrees, float amount)
 		{
-			var velocity = Vector2.FromRadian( (float)(degrees * Math.PI) / 180f ) * amount;
+			var velocity = Vector2.FromRadians( (float)(degrees * Math.PI) / 180f ) * amount;
 			Velocity = Velocity.WithX( velocity.x ).WithY( velocity.y );
 		}
 

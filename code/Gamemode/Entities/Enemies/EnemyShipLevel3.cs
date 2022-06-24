@@ -15,7 +15,6 @@ namespace ShipSurvivors
 			MaxSpeed = 50f;
 			Accelleration = 2f;
 			Health = 10f;
-			RenderColor = Color.Black.WithRed( 0.3f );
 			AttackSpeed = 2.5f;
 		}
 
@@ -29,7 +28,7 @@ namespace ShipSurvivors
 			};
 
 
-			bullet.RenderColor = Color.Red;
+			bullet.RenderColor = Color.Gray.WithRed( 1f );
 
 			return bullet;
 		}
@@ -37,7 +36,7 @@ namespace ShipSurvivors
 		public override Vector3 GetLookAtPosition()
 		{
 			float rad = (float) (Time.Tick % 360 * Math.PI) / 180;
-			var position = Vector2.FromRadian( rad );
+			var position = Vector2.FromRadians( rad );
 
 			return Position + (Vector3.Zero.WithX(position.x).WithY(position.y));
 		}

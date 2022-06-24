@@ -36,7 +36,7 @@ namespace Degg.Cameras {
 		public void Shake( float amount )
 		{
 			ShakeAmount = amount;
-			Position = Position.WithX( Position.x + Rand.Float( -amount, amount ) ).WithY( Position.y +  Rand.Float( -amount, amount ) );
+			Position = Position.WithX( Position.x + amount );
 		}
 		public override void Update()
 		{

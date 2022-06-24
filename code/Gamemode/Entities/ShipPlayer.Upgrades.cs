@@ -1,8 +1,8 @@
 ﻿
 using Degg;
-using Degg.Util;
 using Sandbox;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ShipSurvivors
 {
@@ -31,15 +31,16 @@ namespace ShipSurvivors
 		public float GetUpgradeLevel(string className)
 		{
 			var upgrades = GetUpgrades();
+			float level = 0;
 
 			foreach(var i in upgrades)
 			{
 				if (i.ClassName == className )
 				{
-					return i.Level;
+					level = level + i.Level;
 				}
 			}
-			return 0;
+			return level;
 		}
 
 		public bool HasUpgrade(string className)
@@ -81,14 +82,18 @@ namespace ShipSurvivors
 
 
 				var newUpgrade = Rand.FromList( upgrades );
-				var isExistingUpgrade = newUpgrades.Find( ( item ) =>item.ClassName == newUpgrade.ClassName)?.IsValid ?? false;
-
-				if (!isExistingUpgrade )
+				newUpgrade.Owner = this;
+				if ( newUpgrade.CanBuyUpgrade() )
 				{
-					amountAdded = amountAdded - 1;
-					newUpgrade.Owner = this;
-					newUpgrade.Active = true;
-					newUpgrades.Add( newUpgrade );
+					var isExistingUpgrade = newUpgrades.Find( ( item ) => item.ClassName == newUpgrade.ClassName )?.IsValid ?? false;
+
+					if ( !isExistingUpgrade )
+					{
+						amountAdded = amountAdded - 1;
+						newUpgrade.Owner = this;
+						newUpgrade.Active = true;
+						newUpgrades.Add( newUpgrade );
+					}
 				}
 			}
 
@@ -100,6 +105,16 @@ namespace ShipSurvivors
 		public virtual List<Upgrade> GetUpgradesToBuy()
 		{
 			var upgrades = new List<Upgrade>();
+			var classNames = GetUpgradeClassNames();
+			foreach ( var className in classNames )
+			{
+				var entity = CreateByName<Upgrade>( className );
+				if ( !(entity.ParentUpgrade?.IsValid() ?? false) )
+				{
+					entity.ParentUpgrade = null;
+				}
+				upgrades.Add( entity );
+			}
 
 			foreach ( var upgrade in Upgrades )
 			{
@@ -181,6 +196,10 @@ namespace ShipSurvivors
 			if ( existingUpgrade?.IsValid() ?? false)
 			{
 				existingUpgrade.Level = existingUpgrade.Level + 1;
+				DeleteNonActiveUpgrades();
+				UpdateStats();
+
+				return existingUpgrade;
 			}
 			upgrade.Active = true;
 			upgrade.Owner = this;
@@ -234,7 +253,7 @@ namespace ShipSurvivors
 				Upgrades = new List<Upgrade>();
 			}
 
-			Damage = 1;
+			Damage = 0.5f;
 			MaxHealth = 10;
 			MovementSpeed = 1;
 			TurnSpeed = 1f;

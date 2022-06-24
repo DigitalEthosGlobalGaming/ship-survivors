@@ -17,7 +17,29 @@ namespace Sandbox.Gamemode.Entities.ShipPlayerShips.cs
 			var upgrades = base.GetUpgradesToBuy();
 
 			return upgrades;
+		}
 
+		public override string[] GetUpgradeClassNames()
+		{
+			return new string[] {
+				"FigherUpgradeShieldRegeneration",
+				"FigherUpgradeShieldCapacity",
+			};
+		}
+
+
+		public override void OnRoundStart()
+		{
+			base.OnRoundStart();
+			var regenLevel = GetUpgradeLevel( "FigherUpgradeShieldRegeneration" );
+			if (regenLevel > 0)
+			{
+				Health = Health + regenLevel;
+				if (Health > MaxHealth)
+				{
+					Health = MaxHealth;
+				}
+			}
 		}
 	}
 }

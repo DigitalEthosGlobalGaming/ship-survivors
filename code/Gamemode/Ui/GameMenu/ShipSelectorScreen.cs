@@ -60,9 +60,6 @@ namespace ShipSurvivors
 					button.Body.SetText( "Coming soon" );
 				}
 			}
-
-			
-
 		}
 	}
 }

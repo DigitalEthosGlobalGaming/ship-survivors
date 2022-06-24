@@ -28,7 +28,6 @@ namespace ShipSurvivors
 			{
 				return;
 			}
-
 			LastStrenghtLostTick = Time.Tick;
 			Strength = Strength - 1;
 			if (Strength <= 0)
@@ -75,6 +74,10 @@ namespace ShipSurvivors
 				}
 
 				if ( Owner == other )
+				{
+					return;
+				}
+				if (other.Owner == Owner)
 				{
 					return;
 				}

@@ -12,6 +12,8 @@ namespace ShipSurvivors
 		public float NextAttackTime { get; set; }
 		public float AttackSpeed { get; set; }
 		public ShipPlayer Target { get; set; }
+		public bool IsBoss { get; set; }
+
 		public override void Spawn()
 		{
 			base.Spawn();
@@ -20,7 +22,7 @@ namespace ShipSurvivors
 			MaxSpeed = 50f;
 			Accelleration = 1f;
 			Health = 3f;
-			RenderColor = Color.Black.WithRed(0.3f);
+			RenderColor = Color.Gray.WithRed(0.9f);
 			NextAttackTime = GetNextAttackTime();
 			AttackSpeed = 5f;
 		}
@@ -51,9 +53,33 @@ namespace ShipSurvivors
 
 		}
 
+		public virtual void ExpensiveTick()
+		{
+			
+		}
 		public override void ServerTick()
 		{
 			base.ServerTick();
+			var roundManager = MyGame.GetRoundManager();
+			if ( roundManager.IsEnding)
+			{
+				var distanceToDealth = (Time.Now - roundManager.RoundEndStartTime) * 100;
+				
+				if ( distanceToDealth > 150 )
+				{
+					OnKilled();
+					return;
+				}
+				if ( Target?.IsValid() ?? false )
+				{
+					var distanceFromTarget = Target.Position.Distance( Position );
+					if ( distanceFromTarget < distanceToDealth )
+					{
+						OnKilled();
+						return;
+					}
+				}
+			}
 			MoveStep();
 			TryShoot();
 		}

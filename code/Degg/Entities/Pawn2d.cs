@@ -86,5 +86,19 @@ namespace Degg.Entities
 				PhysicsBody.GravityEnabled = false;
 			}
 		}
+
+		public override void Touch( Entity other )
+		{
+			base.Touch( other );
+			if (other is BaseTrigger trigger)
+			{
+				OnTriggerTouch( trigger );
+			}
+		}
+
+		public virtual void OnTriggerTouch(BaseTrigger trigger)
+		{
+
+		}
 	}
 }

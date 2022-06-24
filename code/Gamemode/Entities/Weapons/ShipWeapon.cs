@@ -31,10 +31,10 @@ namespace ShipSurvivors
 		{
 			if (Parent is ShipPlayer parent )
 			{
-				var attackSpeed = 1f - parent.AttackSpeed;
+				var attackSpeed = 0.5f - parent.AttackSpeed;
 				if ( attackSpeed < 0.1f )
 				{
-					attackSpeed = 0.1f;
+					attackSpeed = 0.05f;
 				}
 				return attackSpeed;
 			} else if ( Parent is EnemyShip enemyShip )

@@ -5,6 +5,8 @@ namespace ShipSurvivors
 	public class EnemyFighterV2: EnemyShip
 	{
 
+		public EnemyShip ClosestAlly { get; set; }
+
 		public override void Spawn()
 		{
 			base.Spawn();
@@ -14,7 +16,6 @@ namespace ShipSurvivors
 			MaxSpeed = 50f;
 			Accelleration = 2f;
 			Health = 10f;
-			RenderColor = Color.Black.WithRed( 0.3f );
 			AttackSpeed = 2.5f;
 		}
 
@@ -27,13 +28,57 @@ namespace ShipSurvivors
 				Scale = 0.35f
 			};
 
-			var velocity = (Rotation.Forward * (40f));
+			var velocity = (Rotation.Forward * 80f);
 			bullet.PhysicsBody.Velocity = velocity;
-			bullet.RenderColor = Color.Red.WithBlue(0.5f);
+			bullet.RenderColor = Color.Gray.WithRed( 0.9f ).WithBlue(0.7f);
 			bullet.Strength = 2;
 
 			return bullet;
 		}
+
+		public override void ExpensiveTick()
+		{
+			base.ExpensiveTick();
+			var closest = GetClosest<EnemyShip>( 0, 30f );
+			if ( closest?.IsValid() ?? false )
+			{				
+				ClosestAlly = closest;
+
+				var inverse = closest.Position - Position;
+				// Todo, move this to the move step function
+				PhysicsBody.Velocity = -inverse * 25 * Time.Delta;
+				if ( NetworkIdent % 2 == 0 )
+				{
+					PhysicsBody.Velocity = PhysicsBody.Velocity + (Rotation.Left * Time.Delta * 12);
+				} else
+				{
+					PhysicsBody.Velocity = PhysicsBody.Velocity + (Rotation.Right * Time.Delta * 10);
+				}
+			}
+		}
+
+		public override void MoveStep()
+		{
+			base.MoveStep();
+			if ( PhysicsBody?.IsValid() ?? false )
+			{
+				if ( NetworkIdent % 2 == 0 )
+				{
+					PhysicsBody.Velocity = PhysicsBody.Velocity + (Rotation.Left * Time.Delta * 50);
+				}
+				else
+				{
+					PhysicsBody.Velocity = PhysicsBody.Velocity + (Rotation.Right * Time.Delta * 50);
+
+				}
+				var amount = PhysicsBody.Velocity.Distance( Vector3.Zero );
+				if ( amount > 150 )
+				{
+					PhysicsBody.Velocity = PhysicsBody.Velocity.Normal * 150;
+				}
+			}
+		}
+
 
 		public override void TryShoot()
 		{

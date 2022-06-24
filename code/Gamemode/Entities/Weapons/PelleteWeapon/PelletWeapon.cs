@@ -1,10 +1,5 @@
-﻿using Degg.Entities;
-using Sandbox;
+﻿using Sandbox;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ShipSurvivors
 {
@@ -18,58 +13,76 @@ namespace ShipSurvivors
 		public int AttackBulletPenetration { get; set; }
 		public float AttackBulletDamage { get; set; }
 		public float AttackBulletSpeed { get; set; }
-
-		public override void Spawn()
-		{
-			base.Spawn();
-		}
-
 		public override void ResetStats()
 		{
 			base.ResetStats();
-			AttackBulletDamage = 1;
+			AttackBulletDamage = 0.5f;
 			AttackBulletPenetration = 1;
 			AttackBulletSize = 0.2f;
 			AttackBulletSpeed = 1f;
 		}
-
-		public override void OnFire()
+		public Bullet CreateBullet()
 		{
 			var bullet = new Bullet();
-			bullet.Owner = this;
-			bullet.Position = Position + (Rotation.Forward * 5f);
+			bullet.Owner = GetShipPlayer();
 			bullet.Scale = AttackBulletSize;
 			bullet.Strength = AttackBulletPenetration;
 			bullet.Damage = AttackBulletDamage;
 
-			var ownerVelocity = Owner.Velocity;
-			var speed = ownerVelocity.Dot( Rotation.Forward );
 
-			var velocity = (Rotation.Forward * (50f + AttackBulletSpeed));
-			if ( speed > 0 ) {
-				velocity = velocity + Owner.Velocity;
-			}
+			var velocity = (Rotation.Forward * (50f + 50));
 			bullet.PhysicsBody.Velocity = velocity;
 			bullet.EntityMaterial = "materials/bullets/bullet_player_1.vmat";
+			return bullet;
+		}
+		public override void OnFire()
+		{
+			var player = GetShipPlayer();
+
+			var bullet = CreateBullet();
+			bullet.Position = Position + (Rotation.Forward * 5f);
+
 			PlaySoundOnClient( "ship.weapon.fire" );
 
-			if (Owner is ShipPlayer player)
+			if (player != null)
 			{
-				player.ScreenShakeOnClient( 1f );
+				var homingBulletChange = player.GetUpgradeLevel( "PelleteWeaponUpgradeSideGunner" );
+				if ( homingBulletChange > 0 )
+				{
+					for ( int i = 0; i < homingBulletChange; i++ )
+					{
+						var rnd = Rand.Float( 0, 100 ) <= 25;
+						if (rnd || true)
+						{
+							var enemies = MyGame.GetRoundManager().Enemies;
+							var enemy = Rand.FromList( enemies );
+							if ( enemy?.IsValid() ?? false )
+							{
+								var extraBullet = CreateBullet();
+								extraBullet.RenderColor = Color.White.WithGreen(0.5f);
+								extraBullet.Position = Position;
+								extraBullet.LookAt( enemy.Position );
+								extraBullet.Velocity = extraBullet.Rotation.Forward * (100f);
+							}
+						}
+					}					
+				}
+				player.ScreenShakeOnClient( 0.5f );
 			}
 		}
-
-
+		private Vector3 Vector2( float x, object y )
+		{
+			throw new NotImplementedException();
+		}
 		public override string[] GetUpgradeClassNames()
 		{
 			return new string[] {
+				"PelleteWeaponUpgradeSideGunner",
 				"PelletWeaponUpgradeBulletSize",
-				"PelletWeaponUpgradeBulletSpeed",
 				"PelletWeaponUpgradeBulletPenetration",
 				"PelletWeaponUpgradeBulletSplashDamage",
 				"PelletWeaponUpgradeBulletDamage",
-				"PelletWeaponUpgradeAttackSpeed",
-				"PelletWeaponUpgradeLifeSteal"
+				"PelletWeaponUpgradeAttackSpeed"
 			};
 		}
 	}

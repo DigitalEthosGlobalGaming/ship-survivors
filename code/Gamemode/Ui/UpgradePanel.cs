@@ -94,8 +94,18 @@ namespace ShipSurvivors
 					icons[upgrade.UpgradeName] = element;
 				}
 				icons[upgrade.UpgradeName].Texture = upgrade.Image;
-				icons[upgrade.UpgradeName].Amount = icons[upgrade.UpgradeName].Amount + 1;
+				icons[upgrade.UpgradeName].Amount = icons[upgrade.UpgradeName].Amount + (int)upgrade.Level;
 			}
+
+
+			UpdateCardsToBuy();
+		}
+
+		public void UpdateHasUpgradesToBuy()
+		{
+			var upgrades = GetUpgradesToBuy();
+
+			HasUpgradesToBuy = upgrades.Count > 0;
 		}
 
 		[Event( "ss.upgrades-to-buy.change" )]
@@ -116,7 +126,7 @@ namespace ShipSurvivors
 				element.SetUpgrade( upgrade );
 			}
 
-			HasUpgradesToBuy = upgrades.Count > 0;
+			UpdateHasUpgradesToBuy();
 		}
 
 

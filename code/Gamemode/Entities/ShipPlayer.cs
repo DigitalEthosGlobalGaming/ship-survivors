@@ -27,6 +27,9 @@ namespace ShipSurvivors
 		public Rotation TargetRotation { get; set; }
 
 
+		public bool IsShooting { get; set; }
+
+
 		public override void Spawn()
 		{
 			base.Spawn();
@@ -119,15 +122,29 @@ namespace ShipSurvivors
 
 			if ( IsServer )
 			{
+				var round = MyGame.GetRoundManager();
+				if ( round.IsEnding)
+				{
+					DebugOverlay.Sphere( Position, (Time.Now - round.RoundEndStartTime) * 100, Color.Blue );
+				}
 				if ( Input.Down( InputButton.PrimaryAttack ) )
 				{
+					IsShooting = true;
 					FireBullet();
+				} else
+				{
+					IsShooting = false;
 				}
 
 				if ( Input.Pressed( InputButton.Slot9 ) )
 				{
-					var round = MyGame.GetRoundManager();
 					round.EndRound();
+				}
+
+				if ( Input.Pressed( InputButton.Slot0 ) )
+				{					
+					round.IsEnding = true;
+					round.RoundEndStartTime = Time.Now;
 				}
 				if ( Input.Pressed( InputButton.Slot8 ) )
 				{					
@@ -155,45 +172,61 @@ namespace ShipSurvivors
 					var backward = Vector3.Backward;
 					var left = Vector3.Left;
 					var right = Vector3.Right;
+					var localMovementSpeed = MovementSpeed;
+					if ( IsShooting )
+					{
+						localMovementSpeed = localMovementSpeed / 5;
+					}
 
 					if ( Input.Down( InputButton.Forward ) )
 					{
 						isMoving = true;
-						force += forward * 1000f * MovementSpeed;
+						force += forward * 1000f * localMovementSpeed;
 					}
 					if ( Input.Down( InputButton.Back ) )
 					{
 						isMoving = true;
-						force += backward * 1000f * MovementSpeed;
+						force += backward * 1000f * localMovementSpeed;
 					}
 					if ( Input.Down( InputButton.Left ) )
 					{
 						isMoving = true;
-						force += left * 1000f * MovementSpeed;
+						force += left * 1000f * localMovementSpeed;
 					}
 					if ( Input.Down( InputButton.Right ) )
 					{
 						isMoving = true;
-						force += right * 1000f * MovementSpeed;
+						force += right * 1000f * localMovementSpeed;
 					}
 					PhysicsBody.ApplyForce( force );
 				}
 				if ( isMoving == false )
 				{
 					var vel = Velocity;
-					PhysicsBody.ApplyForce( -vel * 1000f * Time.Delta );
+					var localSlowdown = 1000f;
+					if ( IsShooting )
+					{
+						localSlowdown = localSlowdown * 2;
+					}
+					PhysicsBody.ApplyForce( -vel * localSlowdown * Time.Delta );
 				}
 			}
 		}
 
-		public void OnRoundEnd()
+		public virtual void OnRoundEnd()
 		{
 			GiveRandomUpgrades();
 		}
 
-		public void OnRoundStart()
+		public virtual void OnRoundStart()
 		{
-			// GiveRandomUpgrades();
+			
+		}
+
+		public virtual string[] GetUpgradeClassNames()
+		{
+			return new string[] {
+			};
 		}
 
 		[ClientRpc]
@@ -224,9 +257,12 @@ namespace ShipSurvivors
 			}
 		}
 
-
-
-
-
+		public override void OnTriggerTouch( BaseTrigger trigger )
+		{
+			base.OnTriggerTouch( trigger );
+			if ( trigger.Tags.Has( "out_of_bounds" ) )
+			{
+			}
+		}
 	}
 }

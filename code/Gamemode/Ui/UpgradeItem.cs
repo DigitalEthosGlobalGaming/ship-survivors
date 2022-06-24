@@ -49,7 +49,7 @@ namespace ShipSurvivors
 				if ( ParentUpgrade == null )
 				{
 					var parent = Upgrade.ParentUpgradeClassName;
-					if ( parent != null )
+					if ( parent != null && parent != "" )
 					{
 						ParentUpgrade = TypeLibrary.Create<Upgrade>( parent );
 					}

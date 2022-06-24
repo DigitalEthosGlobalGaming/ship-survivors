@@ -107,6 +107,11 @@ namespace ShipSurvivors
 			return null;
 		}
 
+		public virtual bool CanBuyUpgrade()
+		{
+			return true;
+		}
+
 
 		public void Equip(ShipPlayer player)
 		{

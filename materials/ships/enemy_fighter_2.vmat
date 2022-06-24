@@ -15,7 +15,7 @@ Layer0
 	//---- Color ----
 	g_flModelTintAmount "1.000"
 	g_vColorTint "[1.000000 1.000000 1.000000 1.000000]"
-	TextureColor "raw/spaceshooter/src/ship_sidesc.png"
+	TextureColor "materials/ships/enemies/enemy_fighter_2.png"
 
 	//---- Fade ----
 	g_flFadeExponent "1.000"
@@ -45,5 +45,5 @@ Layer0
 
 	//---- Translucent ----
 	g_flOpacityScale "1.000"
-	TextureTranslucency "raw/spaceshooter/src/ship_sidesc.png"
+	TextureTranslucency "materials/ships/enemies/enemy_fighter_2.png"
 }

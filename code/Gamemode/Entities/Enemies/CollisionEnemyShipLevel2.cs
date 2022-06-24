@@ -10,10 +10,9 @@ namespace ShipSurvivors
 			base.Spawn();
 			EntityMaterial = "materials/ships/enemy_collision_ship_2.vmat";
 
-			Scale = 1.5f;
-			Accelleration = 15f;
-			Health = 50f;
-			RenderColor = Color.Black.WithBlue( 0.1f ).WithRed(0.2f);
+			Scale = 1f;
+			Accelleration = 40f;
+			Health = 10f;
 		}
 
 

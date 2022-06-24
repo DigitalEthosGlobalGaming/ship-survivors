@@ -14,9 +14,8 @@ $background-gradient2: linear-gradient(to bottom, #0F1C21 0%, #132935 100%);
 }
 
 .card {
-    width: 300px;
-
     .card-inner {
+        width: 100%;
         color: $color-theme;
         background-color: rgb(81, 211, 213,0.05);
         border-color: #;

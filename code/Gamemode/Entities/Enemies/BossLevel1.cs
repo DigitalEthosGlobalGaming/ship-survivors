@@ -11,7 +11,8 @@ namespace ShipSurvivors
 			base.Spawn();
 			EntityMaterial = "materials/ships/enemy_boss_level1.vmat";
 			Scale = 2.5f;
-			Health = 2500f;
+			Health = 1500f;
+			IsBoss = true;
 
 			AttackSpeed = 0.5f;
 		}
@@ -44,7 +45,7 @@ namespace ShipSurvivors
 		public override void MoveStep()
 		{
 			base.MoveStep();
-			if ( Health < 1000)
+			if ( Health < 750)
 			{
 				ChargeDuration = ChargeDuration - Time.Delta;
 				AttackSpeed = 0.25f;

@@ -7,7 +7,6 @@ namespace ShipSurvivors
 
 	public partial class WeaponUpgrade : Upgrade 
 	{
-
 		public T GetWeapon<T>() where T: ShipWeapon
 		{
 			var parentUpgrade = GetParentUpgrade();

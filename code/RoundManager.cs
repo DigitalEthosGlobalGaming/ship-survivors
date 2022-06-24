@@ -16,6 +16,8 @@ namespace ShipSurvivors
 		public List<EnemyShip> Enemies { get; set; }
 		public List<string> EnemiesThatCanSpawn { get; set; }
 
+		public int CurrentExpensiveTickIndex { get; set; }
+
 		public Dictionary<int,string> BossRounds { get; set; }
 
 		public float NextEnemySpawn { get; set; }
@@ -25,11 +27,15 @@ namespace ShipSurvivors
 
 		public Timer CheckEnemiesTimer { get; set; }
 
+		[Net]
 		public float EnemiesToKill { get; set; }
 
 		public bool HasStarted { get; set; }
 
 		public float NextRoundStartTime { get; set; }
+
+		public bool IsEnding { get; set; }
+		public float RoundEndStartTime { get; set; }
 
 		public override void Spawn()
 		{
@@ -224,6 +230,7 @@ namespace ShipSurvivors
 		public override void OnRoundStart()
 		{
 			NextEnemySpawn = 0;
+			IsEnding = false;
 			Difficulty.UpdateDifficulty( 1 );
 			var d = (int) Difficulty.Difficulty;
 			MaxEnemiesAlive = (int) Difficulty.GetValue( "MaxEnemiesAlive", 2);
@@ -258,7 +265,6 @@ namespace ShipSurvivors
 		public override void OnRoundEnd()
 		{
 			base.OnRoundEnd();
-			Log.Info( "YES" );
 			DeleteBullets();
 			DeleteEnemies();
 			var players = DeggPlayer.GetAllPlayers<ShipPlayer>();
@@ -273,6 +279,7 @@ namespace ShipSurvivors
 		public void UpdateEnemiesAlive()
 		{
 			var newEnemies = new List<EnemyShip>();
+			var isBossAlive = false;
 			foreach ( var enemy in Enemies )
 			{
 				if ( !(enemy?.IsValid() ?? false) )
@@ -280,15 +287,28 @@ namespace ShipSurvivors
 					EnemiesToKill = EnemiesToKill - 1;
 				} else
 				{
+					if (enemy.IsBoss)
+					{
+						isBossAlive = true;
+					}
 					newEnemies.Add( enemy );
 				}
 			}
 			Enemies = newEnemies;
+			if ( isBossAlive )
+			{
+				return;
+			}
+			if (EnemiesToKill <= 0 && IsEnding == false)
+			{
+				RoundEndStartTime = Time.Now;
+				IsEnding = true;
+			}
 		}
 
 		public override bool CanRoundEnd()
 		{
-			if ( EnemiesToKill <= 0)
+			if ( Enemies.Count() <= 0 && IsEnding)
 			{
 				return true;
 			}
@@ -305,6 +325,19 @@ namespace ShipSurvivors
 
 		public override void InProgressTick()
 		{
+			if ( CurrentExpensiveTickIndex >= Enemies.Count)
+			{
+				CurrentExpensiveTickIndex = 0;
+			}
+			if ( Enemies.Count > 0 ) {
+				var enemy = Enemies[CurrentExpensiveTickIndex];
+				if ( enemy?.IsValid ?? false )
+				{
+					enemy.ExpensiveTick();
+				}
+				CurrentExpensiveTickIndex = CurrentExpensiveTickIndex + 1;
+			}
+			
 			if (NextEnemySpawn < Time.Now)
 			{
 				var spawnRate = 5f;
@@ -345,6 +378,10 @@ namespace ShipSurvivors
 		}
 		public void SpawnEnemy()
 		{
+			if ( IsEnding )
+			{
+				return;
+			}
 			var spawnPosition = GetValidSpawnPoint();
 			if ( spawnPosition.HasValue)
 			{

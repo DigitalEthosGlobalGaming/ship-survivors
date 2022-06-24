@@ -5,6 +5,9 @@ namespace ShipSurvivors
 	public class EnemyFighter: EnemyShip
 	{
 
+
+		public EnemyShip ClosestAlly { get; set; }
+
 		public override void Spawn()
 		{
 			base.Spawn();
@@ -29,11 +32,25 @@ namespace ShipSurvivors
 				Scale = 0.25f
 			};
 
-			var velocity = (Rotation.Forward * (40f));
+			var velocity = (Rotation.Forward * 80f);
 			bullet.PhysicsBody.Velocity = velocity;
-			bullet.RenderColor = Color.Red;
+			bullet.RenderColor = Color.Gray.WithRed( 0.9f );
 
 			return bullet;
+		}
+
+		public override void ExpensiveTick()
+		{
+			base.ExpensiveTick();
+			var closest = GetClosest<EnemyShip>(0,10f);
+			if ( closest?.IsValid() ?? false )
+			{
+				ClosestAlly = closest;
+
+				// Todo, move this to the move step function
+				var inverse = closest.Position - Position;
+				PhysicsBody.Velocity = -inverse * 25 * Time.Delta;
+			}
 		}
 
 		public override void TryShoot()

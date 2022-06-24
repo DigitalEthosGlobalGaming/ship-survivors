@@ -14,19 +14,13 @@ namespace ShipSurvivors
 		public override string Image { get; set; } = "/raw/crosshairs/green/crosshair186.png";
 		public override float Rarity { get; set; } = 1;
 
-		public override void Spawn()
-		{
-			base.Spawn();
-			Transmit = TransmitType.Owner;
-			Active = false;
-		}
 		public override void OnOwnerStatsUpdate()
 		{
 			base.OnOwnerStatsUpdate();
 			var weapon = GetWeapon<PelletWeapon>();
 			if ( weapon?.IsValid() ?? false )
 			{
-				weapon.AttackBulletSize = weapon.AttackBulletSize + 0.25f;
+				weapon.AttackBulletSize = weapon.AttackBulletSize + (0.25f * Level);
 			}
 		}
 

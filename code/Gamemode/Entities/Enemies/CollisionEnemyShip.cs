@@ -8,7 +8,7 @@ namespace ShipSurvivors
 		public override void Spawn()
 		{
 			base.Spawn();
-			EntityMaterial = "materials/ships/star_large.vmat";
+			EntityMaterial = "materials/ships/enemies/enemy_collision_1.vmat";
 		}
 
 
@@ -20,9 +20,14 @@ namespace ShipSurvivors
 
 				var targetPosition = targetV;
 				var forceDirection = GetRotationLookingAt( targetPosition ).Forward;
-				Accelleration = 20f;
+				Accelleration = 30f;
+				if (targetPosition.Distance(Position) > 200)
+				{
+					Accelleration = targetPosition.Distance( Position );
+				}
 
-				PhysicsBody.Velocity =  forceDirection * Accelleration;
+
+				PhysicsBody.Velocity = forceDirection * Accelleration;
 			}
 			else
 			{

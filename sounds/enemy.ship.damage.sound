@@ -2,17 +2,17 @@
 {
 	data = 
 	{
-		UI = false
-		Volume = 1
-		VolumeRandom = 0.66
-		Pitch = 1.18
-		PitchRandom = 0.23
+		UI = true
+		Volume = 0.31
+		VolumeRandom = 0
+		Pitch = 1
+		PitchRandom = 0
 		Decibels = 70
 		Sounds = 
 		[
-			resource:"raw/sounds/impactmetal_003.vsnd",
+			resource:"raw/sounds/hit_1.vsnd",
 		]
-		SelectionMode = 3
+		SelectionMode = "Random"
 		MaximumDistance = 1143.9335
 		MinimumDistance = 57.196674
 	}

@@ -14,11 +14,10 @@ namespace ShipSurvivors
 		public override string Image { get; set; } = "/raw/crosshairs/green/crosshair023.png";
 		public override float Rarity { get; set; } = 1;
 
-		public override void Spawn()
+		public override bool CanBuyUpgrade()
 		{
-			base.Spawn();
-			Transmit = TransmitType.Owner;
-			Active = false;
+			var currentAmount = GetShipPlayer()?.GetUpgradeLevel( "PelletWeaponUpgradeAttackSpeed" );
+			return currentAmount < 10;
 		}
 		public override void OnOwnerStatsUpdate()
 		{
@@ -26,7 +25,7 @@ namespace ShipSurvivors
 			var player = base.GetShipPlayer();
 			if ( player?.IsValid() ?? false )
 			{
-				player.AttackSpeed = player.AttackSpeed + 0.1f;
+				player.AttackSpeed = player.AttackSpeed + (0.05f * Level);
 			}
 		}
 
