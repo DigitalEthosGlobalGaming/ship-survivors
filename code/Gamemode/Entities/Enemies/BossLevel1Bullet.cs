@@ -19,7 +19,6 @@ namespace ShipSurvivors
 			SetShape(Entity2DShapes.Circle);
 			Scale = 0.5f;
 			EntityMaterial = "materials/bullets/bullet_1.vmat";
-			CollisionGroup = CollisionGroup.Trigger;
 			Strength = 5;
 			DeathTime = Time.Now + 10f;
 		}

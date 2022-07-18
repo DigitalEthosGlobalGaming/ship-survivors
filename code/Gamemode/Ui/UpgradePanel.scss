@@ -89,4 +89,25 @@ $background-gradient2: linear-gradient(to bottom, #0F1C21 0%, #132935 100%);
 
 
 
+.player-cores-element {
+    width: 100vw;
+    position: absolute;
+    top: 0;
+    left: 0;
+    justify-content: flex-end;
+
+    .player-cores-element-label {
+        color: rgb(81, 211, 213);
+        padding: 32px;
+        border-radius: $border-radius;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-top-left-radius: 0;
+        background: $background-gradient2;
+        font-size: $font-size-small;
+    }
+}
+
+
+
 @import "/Gamemode/Ui/styles.scss";

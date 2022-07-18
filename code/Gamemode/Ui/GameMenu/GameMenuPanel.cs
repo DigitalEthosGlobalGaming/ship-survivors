@@ -17,6 +17,7 @@ namespace ShipSurvivors
 			base.SetupMenuItems();
 			SetTitle( "Sky Survivors" );
 			AddMenuItemScreen<ShipSelectorScreen>( "Play" ).AddClass( "game-menu-item" );
+			AddMenuItemScreen<StoreScreen>( "Store" ).AddClass( "game-menu-item" );
 			AddMenuItemScreen<HelpScreen>( "Help", () =>
 			{
 				Log.Info( "Yo" );

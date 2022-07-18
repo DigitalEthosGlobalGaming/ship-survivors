@@ -8,6 +8,23 @@ namespace Degg.Entities
 	public partial class Pawn2D : DeggPlayer
 	{
 
+		[Net, Change]
+		public string EntityMaterial { get; set; }
+
+		public string ClientEntityMaterial { get; set; }
+
+		public void OnEntityMaterialChanged( string before, string after )
+		{
+			SetMaterial( after );
+		}
+
+
+		public void SetMaterial( string name )
+		{
+			var mat = Material.Load( name );
+			SetMaterialOverride( mat );
+		}
+
 		public float ZIndex { get; set; }
 		/// <summary>
 		/// Called when the entity is first created 
@@ -20,6 +37,15 @@ namespace Degg.Entities
 			EnableDrawing = true;
 		}
 
+		public override void ClientSpawn()
+		{
+			base.ClientSpawn();
+			if ( EntityMaterial != null )
+			{
+				SetMaterialOverride( EntityMaterial );
+			}
+		}
+
 		public override void Simulate( Client cl )
 		{
 			if ( Position.z != ZIndex )
@@ -30,11 +56,23 @@ namespace Degg.Entities
 
 		}
 
+
+
 		public override void ServerTick()
 		{
 			base.ServerTick();
-
 		}
+		public override void ClientTick()
+		{
+			base.ClientTick();
+			if ( ClientEntityMaterial != EntityMaterial && EntityMaterial != null )
+			{
+				SetMaterialOverride( EntityMaterial );
+				EntityMaterial = ClientEntityMaterial;
+			}
+		}
+
+
 
 
 		public void LookAt( float x, float y, float rotateAmount = 1f , float degreeOffset = 90f )

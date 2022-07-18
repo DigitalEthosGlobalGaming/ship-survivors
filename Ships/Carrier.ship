@@ -1,0 +1,17 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	data = 
+	{
+		ShipClassName = "ShipPlayerCarrier"
+		ShipName = "Carrier"
+		Description = "Uses drones to attack enemies instead of attacking directly."
+		Active = false
+		Image = resource:"materials/ships/player/player_ship_carrier.png"
+		Material = resource:"materials/ships/player/player_ship_carrier.vmat"
+		Upgrades = null
+		StartingUpgrades = 
+		[
+			resource:"upgrades/dronelauncher/droneweapon.upgrade",
+		]
+	}
+}

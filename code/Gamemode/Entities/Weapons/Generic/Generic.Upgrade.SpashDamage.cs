@@ -2,17 +2,12 @@
 
 namespace ShipSurvivors
 {
-	public partial class PelletWeaponUpgradeBulletSplashDamage : WeaponUpgrade 
+	public partial class GenericWeaponUpgradeBulletSplashDamage : WeaponUpgrade 
 	{
-		public override string ParentUpgradeClassName { get; set; } = "PelletWeapon";
-		public override string UpgradeName { get; set; } = "Fragmenting Shells";
-		public override string Description { get; set; } = "Creates a smaller bullet in a random direction when killing an enemy";
-		public override string Image { get; set; } = "/raw/crosshairs/green/crosshair161.png";
-		public override float Rarity { get; set; } = 1;
 		public void CreateBullets(Entity source, Vector3 position)
 		{
 			var player = GetShipPlayer();
-			var damage = ((player?.GetUpgradeLevel( "PelletWeaponUpgradeBulletSplashDamageLevel2" ) ?? 0) / 2) + 1;
+			var damage = ((player?.GetUpgradeLevel( "GenericWeaponUpgradeBulletSplashDamageLevel2" ) ?? 0) / 2) + 1;
 			var bullet = new Bullet();
 			bullet.Owner = source.Owner;
 			bullet.Position = position;
@@ -38,7 +33,7 @@ namespace ShipSurvivors
 		public override bool CanBuyUpgrade()
 		{
 			var player = GetShipPlayer();
-			var currentAmount = player?.GetUpgradeLevel( "PelletWeaponUpgradeBulletSplashDamage" ) ?? 0;
+			var currentAmount = player?.GetUpgradeLevel( "GenericWeaponUpgradeBulletSplashDamage" ) ?? 0;
 			return currentAmount < 10;
 		}
 
@@ -52,13 +47,6 @@ namespace ShipSurvivors
 					CreateBullets( b, e.Position );
 				}
 			}
-		}
-
-		public override string[] GetUpgradeClassNames()
-		{
-			return new string[] {
-				"PelletWeaponUpgradeBulletSplashDamageLevel2",
-			};
 		}
 	}
 }

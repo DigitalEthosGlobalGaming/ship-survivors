@@ -16,14 +16,14 @@ namespace ShipSurvivors
 		}
 		public float NextFireTime { get; set; }
 
-		public override void Fire()
+		public override void PrimaryAttack()
 		{
 			if ( IsServer )
 			{
 				if ( NextFireTime <= Time.Now )
 				{
 					NextFireTime = Time.Now + GetAttackSpeed();
-					OnFire();
+					OnPrimaryAttack();
 				}
 			}
 		}

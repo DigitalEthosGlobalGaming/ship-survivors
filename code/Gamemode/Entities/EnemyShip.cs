@@ -1,4 +1,5 @@
 ﻿using Degg.Entities;
+using Degg.Networking;
 using Sandbox;
 using System.Linq;
 
@@ -14,9 +15,12 @@ namespace ShipSurvivors
 		public ShipPlayer Target { get; set; }
 		public bool IsBoss { get; set; }
 
+		public float DamageEffectTimeout { get; set; }
+
 		public override void Spawn()
 		{
 			base.Spawn();
+			Tags.Add( "enemy" );
 			SetShape( Entity2DShapes.Square, 0.5f );
 			Scale = 0.5f;
 			MaxSpeed = 50f;
@@ -138,9 +142,14 @@ namespace ShipSurvivors
 
 		}
 
-		public override void TakeDamage( DamageInfo info )
+		public override void ClientTick()
 		{
-			base.TakeDamage( info );
+			base.ClientTick();
+		}
+
+		public override void ClientTakeDamage( NetworkedDamageInfo info )
+		{
+			base.ClientTakeDamage( info );
 		}
 
 		public override void OnKilled()
@@ -148,7 +157,16 @@ namespace ShipSurvivors
 			base.OnKilled();
 			EmitSound( "enemy.ship.destroy" );
 			Delete();
-
+			var roundManager = MyGame.GetRoundManager();
+			if (!roundManager.IsEnding )
+			{
+				var canSpawn = Rand.Float( 1 ) <= 0.1;
+				if ( canSpawn )
+				{
+					var collectible = new Collectible();
+					collectible.Position = this.Position;
+				}
+			}
 		}
 
 

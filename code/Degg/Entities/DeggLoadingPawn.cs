@@ -15,10 +15,11 @@ namespace Degg.Entities
 			base.Spawn();
 		}
 
-		public virtual void OnJoin()
+		public virtual Entity OnJoin()
 		{
 			Delete();
 			Client.Pawn = CreateByName( EntityName );
+			return Client.Pawn;
 		}
 
 		public override void HudSetup()

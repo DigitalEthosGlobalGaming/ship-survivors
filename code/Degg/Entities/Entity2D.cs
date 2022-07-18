@@ -1,6 +1,9 @@
-﻿using Sandbox;
+﻿using Degg.Networking;
+using Degg.Util;
+using Sandbox;
 using System;
 using System.Linq;
+using System.Text.Json;
 
 namespace Degg.Entities
 {
@@ -24,8 +27,12 @@ namespace Degg.Entities
 
 		public void OnEntityMaterialChanged( string before, string after)
 		{
-			var mat = Material.Load( after );		
-			
+			SetMaterial( after );
+		}
+
+		public void SetMaterial(string name)
+		{
+			var mat = Material.Load( name );
 			SetMaterialOverride( mat );
 		}
 
@@ -69,17 +76,49 @@ namespace Degg.Entities
 			return closest;
 		}
 
+		public T GetClosestPawn<T>( float? min = null, float? max = null ) where T : Pawn2D
+		{
+			var entities = Pawn2D.All.ToList();
+			float closestDistance = float.MaxValue;
+			T closest = null;
+			foreach ( var entity in entities )
+			{
+				if ( entity != this )
+				{
+					if ( entity is T t )
+					{
+						if ( entity?.IsValid() ?? false )
+						{
+							var distance = Position.Distance( entity.Position );
+							var minD = min.GetValueOrDefault( distance );
+							var maxD = max.GetValueOrDefault( distance );
+							if ( distance >= minD && distance <= maxD )
+							{
+								if ( distance < closestDistance )
+								{
+									closestDistance = distance;
+									closest = t;
+								}
+							}
+						}
+					}
+				}
+			}
+			return closest;
+		}
+
 		public void SetShape( Entity2DShapes shape, float scale = 1f)
 		{
 			switch ( shape )
 			{
 				case Entity2DShapes.Square:
-					var a = DefaultEntitySize / 2;
+					var a = DefaultEntitySize;
 					a = a * scale;
 					SetupPhysicsFromOBB( PhysicsMotionType.Dynamic, -a, a );
+					Log.Info( "Square" );
 					break;
 				case Entity2DShapes.Circle:
-					SetupPhysicsFromSphere( PhysicsMotionType.Dynamic, Vector3.Zero, 2.5f * scale );
+					SetupPhysicsFromSphere( PhysicsMotionType.Dynamic, Vector3.Zero, 5f * scale );
 					break;
 				case Entity2DShapes.Other:
 					break;
@@ -182,6 +221,26 @@ namespace Degg.Entities
 		public void EmitSound( string name )
 		{
 			PlaySound( name );
+		}
+
+		public override void TakeDamage( DamageInfo info )
+		{
+			base.TakeDamage( info );
+			var networkedInfo = new NetworkedDamageInfo( info );
+			ClientTakeDamage( networkedInfo.Serialise() );
+		}
+
+
+		[ClientRpc]
+		public void ClientTakeDamage( string data )
+		{
+			var info = NetworkedDamageInfo.Deserialise( data );
+			ClientTakeDamage( info );
+		}
+
+		public virtual void ClientTakeDamage( NetworkedDamageInfo data )
+		{
+			
 		}
 	}
 }

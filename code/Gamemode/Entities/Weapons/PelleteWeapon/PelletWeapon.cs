@@ -7,8 +7,6 @@ namespace ShipSurvivors
 	{
 		public override string UpgradeName { get; set; } = "Pellet Weapon";
 		public override string Description { get; set; } = "Basic Pellet Weapon";
-		public override string Image { get; set; } = "/raw/crosshairs/green/crosshair177.png";
-		public override float Rarity { get; set; } = 1;
 		public float AttackBulletSize { get; set; }
 		public int AttackBulletPenetration { get; set; }
 		public float AttackBulletDamage { get; set; }
@@ -35,7 +33,7 @@ namespace ShipSurvivors
 			bullet.EntityMaterial = "materials/bullets/bullet_player_1.vmat";
 			return bullet;
 		}
-		public override void OnFire()
+		public override void OnPrimaryAttack()
 		{
 			var player = GetShipPlayer();
 
@@ -52,7 +50,7 @@ namespace ShipSurvivors
 					for ( int i = 0; i < homingBulletChange; i++ )
 					{
 						var rnd = Rand.Float( 0, 100 ) <= 25;
-						if (rnd || true)
+						if (rnd)
 						{
 							var enemies = MyGame.GetRoundManager().Enemies;
 							var enemy = Rand.FromList( enemies );
@@ -73,17 +71,6 @@ namespace ShipSurvivors
 		private Vector3 Vector2( float x, object y )
 		{
 			throw new NotImplementedException();
-		}
-		public override string[] GetUpgradeClassNames()
-		{
-			return new string[] {
-				"PelleteWeaponUpgradeSideGunner",
-				"PelletWeaponUpgradeBulletSize",
-				"PelletWeaponUpgradeBulletPenetration",
-				"PelletWeaponUpgradeBulletSplashDamage",
-				"PelletWeaponUpgradeBulletDamage",
-				"PelletWeaponUpgradeAttackSpeed"
-			};
 		}
 	}
 }

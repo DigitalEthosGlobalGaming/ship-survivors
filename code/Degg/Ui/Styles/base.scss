@@ -1,14 +1,4 @@
 ﻿@import "Elements/DeggCard.scss";
 @import "Elements/FullScreenPanel.scss";
 @import "Elements/SimpleGameMenu.scss";
-
-
-.center {
-    display: flex;
-    justify-content: center;
-    align-content: center;
-}
-
-.hidden {
-    display:none;
-}
+@import "flex.scss";

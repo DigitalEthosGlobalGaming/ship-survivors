@@ -35,6 +35,7 @@ namespace ShipSurvivors
 			UpgradeIconsPanel = AddChild<Panel>("upgrade-icons-panel");
 
 			AddChild<PlayerHealthElement>();
+			AddChild<PlayerCoresElement>();
 
 			Crosshair = AddChild<ShipCrosshair>();
 

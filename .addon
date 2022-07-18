@@ -8,7 +8,9 @@
   "AssetsPath": "",
   "ResourcePaths": [
     "/raw/*",
-    "/fonts/*"
+    "/fonts/*",
+    "/upgrades/*",
+    "/ships/*"
   ],
   "HasCode": true,
   "CodePath": "/code/",
@@ -16,14 +18,49 @@
   "Metadata": {
     "MapList": [
       "degg.sky_survivor_map",
-      "sky_survivor_map"
+      ""
     ],
     "PerMapRanking": false,
-    "LeaderboardType": 0,
-    "RankType": 0,
-    "MapSelect": 1,
-    "GameNetworkType": 1,
+    "LeaderboardType": "None",
+    "RankType": "None",
+    "MapSelect": "Hidden",
+    "GameNetworkType": "Singleplayer",
     "MaxPlayers": 1,
-    "MinPlayers": 1
+    "MinPlayers": 1,
+    "Collision": {
+      "Defaults": {
+        "solid": "Trigger",
+        "trigger": "Trigger",
+        "bullet": "Trigger",
+        "collectible": "Ignore",
+        "enemy": "Trigger",
+        "player": "Trigger"
+      },
+      "Pairs": [
+        {
+          "a": "solid",
+          "b": "solid"
+        },
+        {
+          "a": "trigger",
+          "b": "playerclip",
+          "r": "Ignore"
+        },
+        {
+          "a": "collectible",
+          "b": "player",
+          "r": "Trigger"
+        },
+        {
+          "a": "solid",
+          "b": "trigger"
+        },
+        {
+          "a": "playerclip",
+          "b": "solid",
+          "r": "Collide"
+        }
+      ]
+    }
   }
 }

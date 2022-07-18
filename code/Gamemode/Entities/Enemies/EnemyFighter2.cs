@@ -45,14 +45,18 @@ namespace ShipSurvivors
 				ClosestAlly = closest;
 
 				var inverse = closest.Position - Position;
-				// Todo, move this to the move step function
-				PhysicsBody.Velocity = -inverse * 25 * Time.Delta;
-				if ( NetworkIdent % 2 == 0 )
+				if ( PhysicsBody?.IsValid() ?? false )
 				{
-					PhysicsBody.Velocity = PhysicsBody.Velocity + (Rotation.Left * Time.Delta * 12);
-				} else
-				{
-					PhysicsBody.Velocity = PhysicsBody.Velocity + (Rotation.Right * Time.Delta * 10);
+					// Todo, move this to the move step function
+					PhysicsBody.Velocity = -inverse * 25 * Time.Delta;
+					if ( NetworkIdent % 2 == 0 )
+					{
+						PhysicsBody.Velocity = PhysicsBody.Velocity + (Rotation.Left * Time.Delta * 12);
+					}
+					else
+					{
+						PhysicsBody.Velocity = PhysicsBody.Velocity + (Rotation.Right * Time.Delta * 10);
+					}
 				}
 			}
 		}

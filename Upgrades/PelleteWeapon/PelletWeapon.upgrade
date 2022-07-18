@@ -1,0 +1,19 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	data = 
+	{
+		ClassName = "PelletWeapon"
+		UpgradeName = "Pellet Weapon"
+		Description = "Basic weapon"
+		Image = resource:"raw/crosshairs/green/crosshair177.png"
+		ChildrenUpgrades = 
+		[
+			resource:"upgrades/generic/generic.attack_speed.upgrade",
+			resource:"upgrades/generic/generic.bullet_damage.upgrade",
+			resource:"upgrades/generic/generic.bullet_size.upgrade",
+			resource:"upgrades/generic/generic.splash_damage.upgrade",
+			resource:"upgrades/generic/generic.bullet_penetration.upgrade",
+			resource:"upgrades/pelleteweapon/pelletweapon.side_gunner.upgrade",
+		]
+	}
+}

@@ -1,6 +1,9 @@
 ﻿
 using Degg;
+using Degg.Core;
+using Degg.Util;
 using Sandbox;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -72,6 +75,10 @@ namespace ShipSurvivors
 		{
 			DeleteNonActiveUpgrades();
 			var upgrades = GetUpgradesToBuy();
+			if ((upgrades?.Count ?? 0) == 0)
+			{
+				return;
+			}
 			var amountAdded = UpgradeAmount;
 			var maxTries = 1000;
 
@@ -79,8 +86,6 @@ namespace ShipSurvivors
 			while ( amountAdded > 0 && maxTries > 0 )
 			{
 				maxTries = maxTries - 1;
-
-
 				var newUpgrade = Rand.FromList( upgrades );
 				newUpgrade.Owner = this;
 				if ( newUpgrade.CanBuyUpgrade() )
@@ -108,12 +113,20 @@ namespace ShipSurvivors
 			var classNames = GetUpgradeClassNames();
 			foreach ( var className in classNames )
 			{
-				var entity = CreateByName<Upgrade>( className );
-				if ( !(entity.ParentUpgrade?.IsValid() ?? false) )
+				try
 				{
-					entity.ParentUpgrade = null;
+					var entity = CreateByName<Upgrade>( className );
+					if ( !(entity.ParentUpgrade?.IsValid() ?? false) )
+					{
+						entity.ParentUpgrade = null;
+					}
+
+					upgrades.Add( entity );
+				} catch(Exception e)
+				{
+					Log.Warning("Error loading " + className );
+					Log.Warning( e );
 				}
-				upgrades.Add( entity );
 			}
 
 			foreach ( var upgrade in Upgrades )
@@ -216,6 +229,18 @@ namespace ShipSurvivors
 			var upgrade = new T();
 			return BuyUpgrade( upgrade );
 		}
+
+		public Upgrade BuyUpgrade(UpgradeResource upgrade)
+		{
+			if ( upgrade != null )
+			{
+				return BuyUpgrade( upgrade.ClassName );
+			} else
+			{
+				Log.Warning( "Error trying to buy upgrade " + upgrade );
+				return null;
+			}
+		}
 		public Upgrade BuyUpgrade(string className)
 		{
 			var entity = CreateByName( className );
@@ -254,7 +279,15 @@ namespace ShipSurvivors
 			}
 
 			Damage = 0.5f;
-			MaxHealth = 10;
+			if ( DeggGame.IsDevelopment() )
+			{
+				MaxHealth = 1000;
+				Health = 1000f;
+			} else
+			{
+				MaxHealth = 10;
+				Health = 10f;
+			}
 			MovementSpeed = 1;
 			TurnSpeed = 1f;
 			MaxSpeed = 50f;

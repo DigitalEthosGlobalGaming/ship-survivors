@@ -1,0 +1,21 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	data = 
+	{
+		ShipClassName = "ShipPlayerFighter"
+		ShipName = "Fighter"
+		Description = "Basic fighter ship"
+		Active = true
+		Image = resource:"raw/spaceshooter/ships/player_fighter.png"
+		Material = resource:"materials/ships/player_ship_1.vmat"
+		Upgrades = 
+		[
+			resource:"upgrades/fighter/fighter.shield_regeneration.upgrade",
+			resource:"upgrades/fighter/fighter.shield_capacity.upgrade",
+		]
+		StartingUpgrades = 
+		[
+			resource:"upgrades/pelleteweapon/pelletweapon.upgrade",
+		]
+	}
+}

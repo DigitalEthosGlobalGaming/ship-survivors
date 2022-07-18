@@ -1,4 +1,5 @@
-﻿using Degg.Core;
+﻿using Degg;
+using Degg.Core;
 using Degg.Entities;
 using Degg.Util;
 using ShipSurvivors;
@@ -40,7 +41,8 @@ namespace Sandbox
 		public RoundManager Rounds { get; set; }
 		public MyGame()
 		{
-			AdvLog.Info( "TESTING" );
+
+			new CurrencySystem();
 			Rounds = new RoundManager();
 		}
 

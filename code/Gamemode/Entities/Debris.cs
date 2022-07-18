@@ -12,7 +12,6 @@ namespace ShipSurvivors
 			SetShape(Entity2DShapes.Circle);
 			
 			EntityMaterial = "materials/bullets/bullet_1.vmat";
-			CollisionGroup = CollisionGroup.Never;
 		}
 
 

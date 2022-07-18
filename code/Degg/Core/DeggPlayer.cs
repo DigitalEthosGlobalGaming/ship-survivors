@@ -56,7 +56,7 @@ namespace Degg.Core
 		}
 
 		[Event.Tick]
-		public void Tick()
+		public virtual void Tick()
 		{
 			if (IsServer)
 			{
@@ -80,8 +80,7 @@ namespace Degg.Core
 
 		public void OnSaveDataChanged(DeggPlayerSave prev, DeggPlayerSave next)
 		{
-			Log.Info( prev );
-			Log.Info( next );
+
 		}
 		public List<string[]> SocketSubscriptions { get; set; }
 		public string GetPlayerId()

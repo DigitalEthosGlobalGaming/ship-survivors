@@ -1,14 +1,19 @@
 ﻿
 using Degg.Cameras;
+using Degg.Core;
 using Degg.Entities;
 using Degg.Util;
+using Degg.Util.CurrencySystem;
 using Sandbox;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ShipSurvivors
 {
 	public partial class ShipPlayer: Pawn2D
 	{
+
 		[Net]
 		public float Coins { get; set; }
 
@@ -27,29 +32,62 @@ namespace ShipSurvivors
 		public Rotation TargetRotation { get; set; }
 
 
-		public bool IsShooting { get; set; }
+		public bool IsShootingPrimary { get; set; }
+		public bool IsShootingSecondary { get; set; }
+		public bool IsUsingSpecial { get; set; }
+
+		public bool IsAccountSetup = false;
+
+		[Net]
+		public DeggCurrencyAccount Account { get; set; }
+
+		[Net]
+		public ShipResource Resource { get; set; }
 
 
 		public override void Spawn()
 		{
 			base.Spawn();
-			Init();
+			Tags.Add( "player" );
+		}
+
+
+		public void LoadFromResource()
+		{
+			var resource = ShipResource.GetResourceForShipPlayer( this );
+			Resource = resource;
+			if (resource != null)
+			{
+				EntityMaterial = resource.Material;
+				if ( resource.StartingUpgrades != null )
+				{
+					foreach ( var item in resource.StartingUpgrades )
+					{
+						var upgrade = UpgradeResource.Get( item );
+						BuyUpgrade( upgrade );
+					}
+				}
+			}
+
+		}
+
+		public void Init(ShipResource ship)
+		{
+			if (IsClient)
+			{
+				return;
+			}
+			Resource = ship;
 			MaxHealth = 10f;
 			Health = 10f;
-		}
 
-		public override void Respawn()
-		{
-			base.Respawn();
-			Init();
-		}
-
-		public void Init()
-		{
+			LoadFromResource();
 			SetShape( Entity2DShapes.Square, 0.5f );
-			CollisionGroup = CollisionGroup.Trigger;
 			SetupStats();
-			Health = 5000f;
+			if ( DeggGame.IsDevelopment() )
+			{
+				Health = 5000f;
+			}
 			Coins = 0f;
 		}
 
@@ -74,13 +112,34 @@ namespace ShipSurvivors
 			UpdateStats();
 		}
 
-		public void FireBullet()
+		public void PrimaryAttackDown()
 		{
 			if (IsServer)
 			{
 				foreach (var i in Upgrades)
 				{
-					i.Fire();
+					i.PrimaryAttack();
+				}
+			}
+		}
+
+		public void SecondaryAttackDown()
+		{
+			if ( IsServer )
+			{
+				foreach ( var i in Upgrades )
+				{
+					i.SecondaryAttack();
+				}
+			}
+		}
+		public void SpecialDown()
+		{
+			if ( IsServer )
+			{
+				foreach ( var i in Upgrades )
+				{
+					i.Special();
 				}
 			}
 		}
@@ -93,9 +152,39 @@ namespace ShipSurvivors
 			input.Position = Cursor;
 		}
 
+		public override void ServerTick()
+		{
+			base.ServerTick();
+			foreach ( var i in Upgrades )
+			{
+				i.ServerTick();
+			}
+			if (!IsAccountSetup)
+			{
+				if (Client?.IsValid() ?? false) {
+					Account = CurrencySystem.Current?.GetAccount( "cores", this.Client );
+					if ( Account?.IsValid() ?? false )
+					{
+						IsAccountSetup = true;
+					}
+				}
+			}
+		}
+
+
+
 		public override void ClientTick()
 		{
 			base.ClientTick();
+
+			foreach ( var i in Upgrades )
+			{
+				if ( i?.IsValid() ?? false )
+				{
+					i.ClientTick();
+				}
+			}
+
 			if ( MouseSensitivity <= 0 )
 			{
 				MouseSensitivity = 1f;
@@ -129,29 +218,57 @@ namespace ShipSurvivors
 				}
 				if ( Input.Down( InputButton.PrimaryAttack ) )
 				{
-					IsShooting = true;
-					FireBullet();
+					IsShootingPrimary = true;
+					PrimaryAttackDown();
 				} else
 				{
-					IsShooting = false;
+					IsShootingPrimary = false;
 				}
 
-				if ( Input.Pressed( InputButton.Slot9 ) )
+				if ( Input.Down( InputButton.PrimaryAttack ) )
 				{
-					round.EndRound();
+					IsShootingSecondary = true;
+					SecondaryAttackDown();
+				}
+				else
+				{
+					IsShootingSecondary = false;
+				}
+				if ( Input.Down( InputButton.Jump ) )
+				{
+					IsShootingSecondary = true;
+					SpecialDown();
+				}
+				else
+				{
+					IsShootingSecondary = false;
 				}
 
-				if ( Input.Pressed( InputButton.Slot0 ) )
-				{					
-					round.IsEnding = true;
-					round.RoundEndStartTime = Time.Now;
-				}
-				if ( Input.Pressed( InputButton.Slot8 ) )
-				{					
-					TakeDamage( new DamageInfo()
+				if ( MyGame.IsDevelopment() )
+				{
+
+					if ( Input.Pressed( InputButton.Slot7 ) )
 					{
-						Damage = 100000
-					} );
+						AddCores( 1 );
+					}
+
+					if ( Input.Pressed( InputButton.Slot9 ) )
+					{
+						round.EndRound();
+					}
+
+					if ( Input.Pressed( InputButton.Slot0 ) )
+					{
+						round.IsEnding = true;
+						round.RoundEndStartTime = Time.Now;
+					}
+					if ( Input.Pressed( InputButton.Slot8 ) )
+					{
+						TakeDamage( new DamageInfo()
+						{
+							Damage = 100000
+						} );
+					}
 				}
 
 			}
@@ -165,6 +282,7 @@ namespace ShipSurvivors
 				{
 					return;
 				}
+				var isShooting = IsShootingSecondary || IsShootingPrimary;
 				if ( currentSpeed < MaxSpeed )
 				{
 					var force = Vector3.Zero;
@@ -173,7 +291,7 @@ namespace ShipSurvivors
 					var left = Vector3.Left;
 					var right = Vector3.Right;
 					var localMovementSpeed = MovementSpeed;
-					if ( IsShooting )
+					if ( isShooting )
 					{
 						localMovementSpeed = localMovementSpeed / 5;
 					}
@@ -198,13 +316,14 @@ namespace ShipSurvivors
 						isMoving = true;
 						force += right * 1000f * localMovementSpeed;
 					}
+					force = SimulateMove( force );
 					PhysicsBody.ApplyForce( force );
 				}
 				if ( isMoving == false )
 				{
 					var vel = Velocity;
 					var localSlowdown = 1000f;
-					if ( IsShooting )
+					if ( isShooting )
 					{
 						localSlowdown = localSlowdown * 2;
 					}
@@ -213,20 +332,58 @@ namespace ShipSurvivors
 			}
 		}
 
+		public virtual Vector3 SimulateMove( Vector3 force)
+		{
+			return force;
+		}
+
 		public virtual void OnRoundEnd()
 		{
+			foreach ( var i in Upgrades )
+			{
+				i.OnRoundEnd();
+			}
 			GiveRandomUpgrades();
+			GetCoresAccount()?.Save();
 		}
 
 		public virtual void OnRoundStart()
 		{
-			
+			foreach ( var i in Upgrades )
+			{
+				i.OnRoundStart();
+			}
+			GetCoresAccount()?.Save();
 		}
 
-		public virtual string[] GetUpgradeClassNames()
+		public virtual List<UpgradeResource> GetUpgradeResources()
 		{
-			return new string[] {
-			};
+			List<UpgradeResource> res = new List<UpgradeResource>();
+			if ( Resource?.Upgrades != null )
+			{
+				foreach ( var upgradePath in Resource?.Upgrades )
+				{
+					var upgrade = UpgradeResource.Get( upgradePath );
+					if ( upgrade != null)
+					{
+						res.Add( upgrade );
+					}
+				}
+			}
+
+			return res;
+		}
+
+		public virtual List<string> GetUpgradeClassNames()
+		{
+			List<UpgradeResource> upgrades = GetUpgradeResources();
+			var res = new List<string>();
+			foreach ( var item in upgrades )
+			{
+				res.Add( item.ClassName );
+			}
+
+			return res;
 		}
 
 		[ClientRpc]
@@ -263,6 +420,17 @@ namespace ShipSurvivors
 			if ( trigger.Tags.Has( "out_of_bounds" ) )
 			{
 			}
+		}
+
+		public void AddCores(float amount)
+		{
+			var account = GetCoresAccount();
+			account.AddAmount( amount );
+		}
+
+		public DeggCurrencyAccount GetCoresAccount()
+		{
+			return Account;
 		}
 	}
 }
