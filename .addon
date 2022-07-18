@@ -9,16 +9,15 @@
   "ResourcePaths": [
     "/raw/*",
     "/fonts/*",
-    "/upgrades/*",
-    "/ships/*"
+    "/Upgrades/*",
+    "/Ships/*"
   ],
   "HasCode": true,
   "CodePath": "/code/",
   "RootNamespace": "Sandbox",
   "Metadata": {
     "MapList": [
-      "degg.sky_survivor_map",
-      ""
+      "degg.sky_survivor_map"
     ],
     "PerMapRanking": false,
     "LeaderboardType": "None",

@@ -228,6 +228,19 @@ namespace ShipSurvivors
 
 		}
 
+		public List<UpgradeResource> GetPotentialParentUpgrades()
+		{
+			var myPath = Resource.ResourcePath;
+			var parents = new List<UpgradeResource>();
+			foreach ( var item in UpgradeResource.GetAll() )
+			{
+				if (item?.ChildrenUpgrades?.Contains(myPath) ?? false)
+				{
+					parents.Add( item );
+				}
+			}
+			return parents;
+		}
 
 		public Upgrade GetParentUpgrade()
 		{
@@ -239,8 +252,17 @@ namespace ShipSurvivors
 			{
 				return null;
 			}
-
-			return GetShipPlayer()?.GetUpgradeByClassName(ParentUpgradeClassName ?? "") ?? null;
+			var parents = GetPotentialParentUpgrades();
+			foreach ( var parent in parents )
+			{
+				var upgrade = GetShipPlayer()?.GetUpgradeByClassName( parent.ClassName ?? "" ) ?? null; ;
+				if ( upgrade?.IsValid() ?? false)
+				{
+					ParentUpgrade = upgrade;
+					return upgrade;
+				}
+			}
+			return null;
 		}
 		public virtual void OnEquip() { }
 

@@ -104,6 +104,7 @@ namespace ShipSurvivors
 				}
 				if ( other is EnemyShip enemy )
 				{
+					Log.Info( Damage );
 					if (Owner is EnemyShip)
 					{
 						return;
