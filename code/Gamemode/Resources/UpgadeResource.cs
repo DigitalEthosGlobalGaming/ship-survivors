@@ -20,13 +20,6 @@ namespace ShipSurvivors
 		[ResourceType( "upgrade" )]
 		public List<string> ChildrenUpgrades { get; set; }
 
-		[Event.Hotload]
-		public void ResetResources()
-		{
-			Log.Info( "Resetting Game Resources" );
-			Resources.Clear();
-		}
-
 		public static List<UpgradeResource> GetAll()
 		{
 			var resources = ResourceLibrary.GetAll<UpgradeResource>();

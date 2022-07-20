@@ -10,18 +10,36 @@ namespace Degg.Ui
 	{
 		public static PlayerHud Current { get; set; }
 		public List<Panel> Panels { get; set; }
+		public Panel Container { get; set; }
 		public DeggPlayer Player { get; set; }
+		public bool NeedsReset { get; set; }
 		public PlayerHud( DeggPlayer player )
 		{
+			Container = RootPanel.AddChild<Panel>();
 			Current = this;
 			Player = player;
 			Panels = new List<Panel>();
-			Setup();
+			NeedsReset = true;
+		}
+
+		[Event.Tick]
+		public void Tick()
+		{
+			if ( NeedsReset == true)
+			{
+				NeedsReset = false;
+				Setup();
+			}
 		}
 
 		[Event.Hotload]
+		public void OnHotload()
+		{
+			NeedsReset = true;
+		}
 		public void Setup()
 		{
+			NeedsReset = false;
 			if ( Panels != null )
 			{
 				foreach ( var i in Panels )
@@ -35,12 +53,9 @@ namespace Degg.Ui
 
 		public virtual void OnSetup()
 		{
-			if ( RootPanel != null )
-			{
-				RootPanel.StyleSheet.Load( "/Degg/Ui/Styles/base.scss" );
-				RootPanel.AddClass( "degg-root" );
-				RootPanel.AddChild<ChatBox>();
-			}
+			Container.StyleSheet.Load( "/Degg/Ui/Styles/base.scss" );
+			Container.AddClass( "degg-root" );
+			Container.AddChild<ChatBox>();
 		}
 
 		public T AddPanel<T>() where T : Panel, new()

@@ -115,7 +115,6 @@ namespace Degg.Entities
 					var a = DefaultEntitySize;
 					a = a * scale;
 					SetupPhysicsFromOBB( PhysicsMotionType.Dynamic, -a, a );
-					Log.Info( "Square" );
 					break;
 				case Entity2DShapes.Circle:
 					SetupPhysicsFromSphere( PhysicsMotionType.Dynamic, Vector3.Zero, 5f * scale );

@@ -20,12 +20,10 @@ namespace ShipSurvivors
 
 		public UpgradePanel()
 		{
-
-			SetTemplate( "/Gamemode/Ui/UpgradePanel.html" );
 			StyleSheet.Load( "/Gamemode/Ui/UpgradePanel.scss" );
+			StyleSheet.Load( "/Gamemode/Ui/styles.scss" );
 			SetupElements();
 			UpdateCards();
-			StyleSheet.Load( "/Gamemode/Ui/styles.scss" );
 		}
 
 		public void SetupElements()
@@ -38,7 +36,6 @@ namespace ShipSurvivors
 			AddChild<PlayerCoresElement>();
 
 			Crosshair = AddChild<ShipCrosshair>();
-
 		}
 
 		public List<Upgrade> GetUpgradesToBuy()

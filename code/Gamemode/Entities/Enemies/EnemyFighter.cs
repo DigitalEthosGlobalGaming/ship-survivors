@@ -49,7 +49,10 @@ namespace ShipSurvivors
 
 				// Todo, move this to the move step function
 				var inverse = closest.Position - Position;
-				PhysicsBody.Velocity = -inverse * 25 * Time.Delta;
+				if ( PhysicsBody?.IsValid() ?? false)
+				{
+					PhysicsBody.Velocity = -inverse * 25 * Time.Delta;
+				}
 			}
 		}
 

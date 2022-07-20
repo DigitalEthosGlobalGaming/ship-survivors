@@ -138,7 +138,7 @@ namespace ShipSurvivors
 					upgrades.Add( item );
 				}
 			}
-
+			
 			return upgrades;
 		}
 

@@ -32,7 +32,11 @@ namespace Degg.Core
 			if ( IsClient )
 			{
 				DeleteHud();
-				Hud = new PlayerHud( this );
+				if ( Hud == null)
+				{
+					Hud = new PlayerHud( this );
+				}
+				Hud.Setup();
 			}
 		}
 	}
