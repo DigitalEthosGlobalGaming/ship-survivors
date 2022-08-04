@@ -37,7 +37,12 @@ namespace ShipSurvivors
 
 		public virtual void ServerTick()
 		{
-
+			var player = GetShipPlayer();
+			if (player != null && !player.IsValid())
+			{
+				Unequip();
+				Delete();
+			}
 		}
 
 		public void ClientTick()
@@ -51,8 +56,7 @@ namespace ShipSurvivors
 			ClientOrServerSpawn();
 			Transmit = TransmitType.Owner;
 			Level = 1;
-			Active = false;
-			
+			Active = false;			
 		}
 
 		public void LoadResource()
@@ -282,6 +286,7 @@ namespace ShipSurvivors
 		{
 
 		}
+
 
 		[ClientRpc]
 		public void PlaySoundOnClient( string name )

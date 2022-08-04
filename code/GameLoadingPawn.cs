@@ -13,6 +13,7 @@ namespace ShipSurvivors
 			Hud.AddPanel<GameMenuPanel>();
 		}
 
+
 		[ConCmd.Server( "ss.client.loaded" )]
 		public static void OnLoad(string SelectedShip)
 		{

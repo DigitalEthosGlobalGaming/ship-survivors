@@ -1,0 +1,114 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc29:version{3cec427c-1b0e-4d48-a90a-0436f33a6041} -->
+
+{
+	rootNode = 
+	{
+		_class = "RootNode"
+		children = 
+		[
+			
+			{
+				_class = "RenderMeshList"
+				children = 
+				[
+					
+					{
+						_class = "RenderPrimitivePlane"
+						name = "base"
+						parent_bone = ""
+						material_name = "assets/ships_generated/ship_a.vmat"
+						origin = 
+						[
+							0.000000,
+							0.000000,
+							0.000000,
+						]
+						angles = 
+						[
+							0.000000,
+							180.000000,
+							0.000000,
+						]
+						max_u = 1.000000
+						max_v = 1.000000
+						width = 10.000000
+						height = 10.000000
+						segments_x = 1.000000
+						segments_y = 1.000000
+					},
+				]
+			},
+			
+			{
+				_class = "MaterialGroupList"
+				children = 
+				[
+					
+					{
+						_class = "MaterialGroup"
+						name = "ship_a"
+						remaps = 
+						[
+						]
+					},
+					
+					{
+						_class = "MaterialGroup"
+						name = "ship_b"
+						remaps = 
+						[
+							
+							{
+								from = "assets/ships_generated/ship_a.vmat"
+								to = "assets/ships_generated/ship_b.vmat"
+							},
+						]
+					},
+					
+					{
+						_class = "MaterialGroup"
+						name = "ship_c"
+						remaps = 
+						[
+							
+							{
+								from = "assets/ships_generated/ship_a.vmat"
+								to = "assets/ships_generated/ship_c.vmat"
+							},
+						]
+					},
+					
+					{
+						_class = "MaterialGroup"
+						name = "ship_d"
+						remaps = 
+						[
+							
+							{
+								from = "assets/ships_generated/ship_a.vmat"
+								to = "assets/ships_generated/ship_d.vmat"
+							},
+						]
+					},
+					
+					{
+						_class = "MaterialGroup"
+						name = "ship_e"
+						remaps = 
+						[
+							
+							{
+								from = "assets/ships_generated/ship_a.vmat"
+								to = "assets/ships_generated/ship_e.vmat"
+							},
+						]
+					},
+				]
+			},
+		]
+		model_archetype = ""
+		primary_associated_entity = ""
+		anim_graph_name = ""
+		base_model_name = ""
+	}
+}

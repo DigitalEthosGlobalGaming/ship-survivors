@@ -28,5 +28,7 @@ namespace ShipSurvivors
 			AttackBulletSize = 0.2f;
 			AttackBulletSpeed = 1f;
 		}
+
+
 	}
 }

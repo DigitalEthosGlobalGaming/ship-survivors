@@ -1,4 +1,5 @@
 ﻿using Degg.Entities;
+using Sandbox;
 
 namespace ShipSurvivors
 {
@@ -9,7 +10,22 @@ namespace ShipSurvivors
 		public override void Spawn()
 		{
 			base.Spawn();
-			Scale = 0.5f;
+			Init();
+		}
+
+		public void Init()
+		{
+			SetShape( Entity2DShapes.Square, 0.5f );
+			EntityMaterial = "materials/ships/drones/player_drone_1.vmat";
+		}
+
+		[Event.Hotload]
+		public void OnHotload()
+		{
+			if (IsServer)
+			{
+				Init();
+			}
 		}
 
 		public Upgrade GetParent()

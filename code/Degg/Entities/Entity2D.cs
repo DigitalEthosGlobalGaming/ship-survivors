@@ -1,13 +1,12 @@
 ﻿using Degg.Networking;
-using Degg.Util;
 using Sandbox;
 using System;
 using System.Linq;
-using System.Text.Json;
 
 namespace Degg.Entities
 {
-	public enum Entity2DShapes {
+	public enum Entity2DShapes
+	{
 		Circle,
 		Square,
 		Other
@@ -16,25 +15,11 @@ namespace Degg.Entities
 	{
 		public const float DefaultEntityMass = 10f;
 		public const float DefaultEntitySize = 10f;
-		[Net,Change]
 		public string EntityMaterial { get; set; }
-
-		public string ClientEntityMaterial { get; set; }
 
 		public float RotationDegrees { get; set; }
 
 		public float ZIndex { get; set; }
-
-		public void OnEntityMaterialChanged( string before, string after)
-		{
-			SetMaterial( after );
-		}
-
-		public void SetMaterial(string name)
-		{
-			var mat = Material.Load( name );
-			SetMaterialOverride( mat );
-		}
 
 		/// <summary>
 		/// Called when the entity is first created 
@@ -42,15 +27,14 @@ namespace Degg.Entities
 		public override void Spawn()
 		{
 			base.Spawn();
-			SetModel( "models/base/mesh_10x10.vmdl" );
 		}
 
-		public T GetClosest<T>(float? min = null, float? max = null) where T: Entity2D
+		public T GetClosest<T>( float? min = null, float? max = null ) where T : Entity2D
 		{
 			var entities = Entity2D.All.ToList();
 			float closestDistance = float.MaxValue;
 			T closest = null;
-			foreach( var entity in entities)
+			foreach ( var entity in entities )
 			{
 				if ( entity != this )
 				{
@@ -107,8 +91,29 @@ namespace Degg.Entities
 			return closest;
 		}
 
-		public void SetShape( Entity2DShapes shape, float scale = 1f)
+		public void SetShape(float radius, float scale)
 		{
+			SetupPhysicsFromSphere( PhysicsMotionType.Dynamic, Vector3.Zero, radius * scale );
+		}
+		public void SetShape(float width, float height, float scale = 1f )
+		{
+			Log.Info( width );
+			width = (width / DefaultEntitySize) * scale;
+			height = (height / DefaultEntitySize) * scale;
+
+			var a = new Vector3( width, height, -1 );
+			SetupPhysicsFromOBB( PhysicsMotionType.Dynamic, -a,a );
+
+			if ( PhysicsBody != null )
+			{
+				PhysicsBody.Mass = DefaultEntityMass;
+				PhysicsBody.GravityEnabled = false;
+			}
+		}
+
+		public void SetShape( Entity2DShapes shape, float scale = 1f )
+		{
+			Scale = scale;
 			switch ( shape )
 			{
 				case Entity2DShapes.Square:
@@ -132,10 +137,6 @@ namespace Degg.Entities
 		public override void ClientSpawn()
 		{
 			base.ClientSpawn();
-			if ( EntityMaterial != null )
-			{
-				SetMaterialOverride( EntityMaterial );
-			}
 		}
 
 		[Event.Tick]
@@ -152,11 +153,12 @@ namespace Degg.Entities
 		}
 		public virtual void ClientTick()
 		{
-			if ( ClientEntityMaterial != EntityMaterial && EntityMaterial != null)
-			{
-				SetMaterialOverride( EntityMaterial );
-				EntityMaterial = ClientEntityMaterial;
-			}
+			//if ( EntityMaterial == null && Sprite.Material != null)
+			//{
+			//	EntityMaterial = Sprite.Material;
+			//	SetMaterialOverride( Sprite.Material );
+			//	Log.Info( "Set" );
+			//}
 		}
 
 		public virtual void ServerTick()
@@ -170,20 +172,20 @@ namespace Degg.Entities
 			Rotation = rotation;
 		}
 
-		public virtual void LookAt( Vector3 position, float? rotateAmount = null)
+		public virtual void LookAt( Vector3 position, float? rotateAmount = null, float degreeOffset = 90f )
 		{
-			LookAt( position.x, position.y, rotateAmount );
+			LookAt( position.x, position.y, rotateAmount, degreeOffset );
 
 		}
 
-		public void LookAt( Vector2 position, float? rotateAmount = null )
+		public void LookAt( Vector2 position, float? rotateAmount = null, float degreeOffset = 90f )
 		{
-			LookAt( position.x, position.y, rotateAmount );
+			LookAt( position.x, position.y, rotateAmount, degreeOffset );
 		}
 
-		public void LookAt( float x, float y, float? rotateAmount = null)
+		public void LookAt( float x, float y, float? rotateAmount = null, float degreeOffset = 90f )
 		{
-			Rotation = GetRotationLookingAt( x, y, rotateAmount );
+			Rotation = GetRotationLookingAt( x, y, rotateAmount, degreeOffset );
 		}
 
 		public Rotation GetRotationLookingAt( Vector3 pos, float? rotateAmount = null, float degreeOffset = 90f )
@@ -191,7 +193,7 @@ namespace Degg.Entities
 			return GetRotationLookingAt( pos.x, pos.y, rotateAmount, degreeOffset );
 		}
 
-		public void SetVelocityFromAngle(float degrees, float amount)
+		public void SetVelocityFromAngle( float degrees, float amount )
 		{
 			var velocity = Vector2.FromRadians( (float)(degrees * Math.PI) / 180f ) * amount;
 			Velocity = Velocity.WithX( velocity.x ).WithY( velocity.y );
@@ -239,7 +241,7 @@ namespace Degg.Entities
 
 		public virtual void ClientTakeDamage( NetworkedDamageInfo data )
 		{
-			
+
 		}
 	}
 }

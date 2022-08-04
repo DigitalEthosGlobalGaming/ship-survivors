@@ -13,7 +13,7 @@
 						_class = "RenderPrimitivePlane"
 						name = "base"
 						parent_bone = ""
-						material_name = "materials/ships/player_ship_1.vmat"
+						material_name = ""
 						origin = [ 0.0, 0.0, 0.0 ]
 						angles = [ 0.0, 180.0, 0.0 ]
 						max_u = 1.0
@@ -22,18 +22,6 @@
 						height = 10.0
 						segments_x = 1
 						segments_y = 1
-					},
-				]
-			},
-			{
-				_class = "MaterialGroupList"
-				children = 
-				[
-					{
-						_class = "DefaultMaterialGroup"
-						remaps = [  ]
-						use_global_default = false
-						global_default_material = ""
 					},
 				]
 			},

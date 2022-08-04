@@ -5,9 +5,9 @@
 		ShipClassName = "ShipPlayerCarrier"
 		ShipName = "Carrier"
 		Description = "Uses drones to attack enemies instead of attacking directly."
-		Active = false
+		Active = true
 		Image = resource:"materials/ships/player/player_ship_carrier.png"
-		Material = resource:"materials/ships/player/player_ship_carrier.vmat"
+		Sprite = "carrier"
 		Upgrades = null
 		StartingUpgrades = 
 		[

@@ -43,6 +43,7 @@ namespace ShipSurvivors
 		public override void ServerTick()
 		{
 			base.ServerTick();
+			Log.Info( NetworkIdent);
 			TryToSpawnDrone();
 		}
 
@@ -50,7 +51,15 @@ namespace ShipSurvivors
 		{
 			var newDrone = CreateByName<DroneBasic>( "DroneBasic" );
 			Drones.Add( newDrone );
+		}
 
+		public override void OnUnEquip()
+		{
+			base.OnUnEquip();
+			foreach ( var item in Drones )
+			{
+				item?.Delete();
+			}
 		}
 
 	}

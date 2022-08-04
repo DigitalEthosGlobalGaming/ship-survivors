@@ -7,23 +7,9 @@ namespace Degg.Entities
 {
 	public partial class Pawn2D : DeggPlayer
 	{
+		[Net]
+		public Entity2D Entity { get; set; }
 
-		[Net, Change]
-		public string EntityMaterial { get; set; }
-
-		public string ClientEntityMaterial { get; set; }
-
-		public void OnEntityMaterialChanged( string before, string after )
-		{
-			SetMaterial( after );
-		}
-
-
-		public void SetMaterial( string name )
-		{
-			var mat = Material.Load( name );
-			SetMaterialOverride( mat );
-		}
 
 		public float ZIndex { get; set; }
 		/// <summary>
@@ -32,19 +18,13 @@ namespace Degg.Entities
 		public override void Spawn()
 		{
 			base.Spawn();
-			SetModel( "models/base/mesh_10x10.vmdl" );
 			SetCamera<TopdownCamera>();
 			EnableDrawing = true;
+			Entity = new Entity2D();
+			Entity.Owner = this;
+			Entity.Parent = this;
 		}
 
-		public override void ClientSpawn()
-		{
-			base.ClientSpawn();
-			if ( EntityMaterial != null )
-			{
-				SetMaterialOverride( EntityMaterial );
-			}
-		}
 
 		public override void Simulate( Client cl )
 		{
@@ -57,27 +37,9 @@ namespace Degg.Entities
 		}
 
 
-
-		public override void ServerTick()
-		{
-			base.ServerTick();
-		}
-		public override void ClientTick()
-		{
-			base.ClientTick();
-			if ( ClientEntityMaterial != EntityMaterial && EntityMaterial != null )
-			{
-				SetMaterialOverride( EntityMaterial );
-				EntityMaterial = ClientEntityMaterial;
-			}
-		}
-
-
-
-
 		public void LookAt( float x, float y, float rotateAmount = 1f , float degreeOffset = 90f )
 		{
-			Rotation = GetRotationLookingAt( x, y, rotateAmount, degreeOffset );
+			Entity?.LookAt( x, y, rotateAmount, degreeOffset );
 		}
 
 		public Rotation GetRotationLookingAt( Vector3 pos, float rotateAmount, float degreeOffset = 90f )
@@ -87,42 +49,7 @@ namespace Degg.Entities
 
 		public Rotation GetRotationLookingAt(float x, float y, float rotateAmount, float degreeOffset = 90f )
 		{
-			float rad = (float)Math.Atan2( -x, y );
-			float deg = (float)(rad * (180 / Math.PI)) + degreeOffset;
-
-			var rotation = Rotation.FromAxis( Vector3.Up, deg ) ;
-			var difference = Rotation.Distance( rotation );
-			if ( rotateAmount == 0 )
-			{
-				return rotation;
-			}
-			else
-			{
-				return Rotation.Slerp( Rotation, rotation, (RealTime.Delta * rotateAmount * 100f) / difference );
-			}
-		}
-
-		public void SetShape( Entity2DShapes shape, float scale = 1f )
-		{
-			switch ( shape )
-			{				
-				case Entity2DShapes.Square:
-					var a = Entity2D.DefaultEntitySize / 2;
-					a = a * scale;
-					SetupPhysicsFromOBB( PhysicsMotionType.Dynamic, -a, a );
-					break;
-				case Entity2DShapes.Circle:
-					SetupPhysicsFromSphere( PhysicsMotionType.Dynamic, Vector3.Zero, 2.5f * scale) ;
-					break;
-				case Entity2DShapes.Other:
-					break;
-			}
-
-			if ( PhysicsBody != null )
-			{
-				PhysicsBody.Mass = Entity2D.DefaultEntityMass;
-				PhysicsBody.GravityEnabled = false;
-			}
+			return Entity?.GetRotationLookingAt( x, y, rotateAmount, degreeOffset) ?? new Rotation();
 		}
 
 		public override void Touch( Entity other )
@@ -137,6 +64,16 @@ namespace Degg.Entities
 		public virtual void OnTriggerTouch(BaseTrigger trigger)
 		{
 
+		}
+
+		protected override void OnDestroy()
+		{
+			base.OnDestroy();
+			if ( IsServer )
+			{
+				Log.Info( "Entity" );
+				Entity?.Delete();
+			}
 		}
 	}
 }

@@ -48,6 +48,8 @@ namespace ShipSurvivors
 		public override void Spawn()
 		{
 			base.Spawn();
+			Entity.SetSpritesheet( "assets/player_ships.sprite" );
+			Entity.SetupPhysics();
 			Tags.Add( "player" );
 		}
 
@@ -58,7 +60,8 @@ namespace ShipSurvivors
 			Resource = resource;
 			if (resource != null)
 			{
-				EntityMaterial = resource.Material;
+				Log.Info( resource.Sprite );
+				Entity.SetSprite( resource.Sprite );
 				if ( resource.StartingUpgrades != null )
 				{
 					foreach ( var item in resource.StartingUpgrades )
@@ -82,7 +85,6 @@ namespace ShipSurvivors
 			Health = 10f;
 
 			LoadFromResource();
-			SetShape( Entity2DShapes.Square, 0.5f );
 			SetupStats();
 			if ( DeggGame.IsDevelopment() )
 			{
@@ -277,8 +279,9 @@ namespace ShipSurvivors
 			{
 				var currentSpeed = Velocity.Distance( Vector3.Zero );
 				var isMoving = false;
+				var phys = Entity?.PhysicsBody;
 
-				if ( !(PhysicsBody?.IsValid() ?? false))
+				if ( !(phys?.IsValid() ?? false))
 				{
 					return;
 				}
@@ -317,7 +320,7 @@ namespace ShipSurvivors
 						force += right * 1000f * localMovementSpeed;
 					}
 					force = SimulateMove( force );
-					PhysicsBody.ApplyForce( force );
+					phys.ApplyForce( force );
 				}
 				if ( isMoving == false )
 				{
@@ -327,7 +330,7 @@ namespace ShipSurvivors
 					{
 						localSlowdown = localSlowdown * 2;
 					}
-					PhysicsBody.ApplyForce( -vel * localSlowdown * Time.Delta );
+					phys.ApplyForce( -vel * localSlowdown * Time.Delta );
 				}
 			}
 		}

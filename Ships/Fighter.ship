@@ -7,7 +7,7 @@
 		Description = "Basic fighter ship"
 		Active = true
 		Image = resource:"raw/spaceshooter/ships/player_fighter.png"
-		Material = resource:"materials/ships/player_ship_1.vmat"
+		Sprite = "fighter"
 		Upgrades = 
 		[
 			resource:"upgrades/fighter/fighter.shield_regeneration.upgrade",

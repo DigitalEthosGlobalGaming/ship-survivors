@@ -26,7 +26,6 @@ namespace ShipSurvivors
 			var results = new List<UpgradeResource>();
 			foreach ( var item in resources )
 			{
-				Resources[item.ResourcePath] = item;
 				results.Add( item );
 			}
 
@@ -50,20 +49,8 @@ namespace ShipSurvivors
 
 		public static UpgradeResource Get(string path)
 		{
-			if (Resources.ContainsKey(path))
-			{
-				return Resources[path];
-			}
-
-			var resources = GetAll();
-			foreach ( var item in resources )
-			{
-				if (item.ResourcePath == path)
-				{
-					return item;
-				}
-			}
-			return null;
+			var resource = ResourceLibrary.Get<UpgradeResource>( path );
+			return resource;
 		}
 
 		public static UpgradeResource GetResourceForUpgrade( Upgrade t )

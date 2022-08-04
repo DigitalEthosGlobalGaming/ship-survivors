@@ -12,8 +12,7 @@ namespace ShipSurvivors
 		public bool Active { get; set; }
 		[ResourceType( "png" )]
 		public string Image { get; set; }
-		[ResourceType( "vmat" )]
-		public string Material { get; set; }
+		public string Sprite { get; set; }
 
 		[ResourceType( "upgrade" )]
 		public List<string> Upgrades { get; set; }

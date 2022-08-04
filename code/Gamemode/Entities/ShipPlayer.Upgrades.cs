@@ -1,11 +1,9 @@
 ﻿
 using Degg;
 using Degg.Core;
-using Degg.Util;
 using Sandbox;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ShipSurvivors
 {
